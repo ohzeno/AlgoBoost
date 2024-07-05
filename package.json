@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "build": "npm run clean && npm run create-dirs && npm run copy-assets && webpack",
+    "clean": "rimraf dist/js/ && rimraf dist/html/ && rimraf dist/css/",
+    "create-dirs": "mkdirp dist/js dist/html dist/css dist/images",
+    "copy-assets": "cp -r src/images dist/ && cp manifest.json dist/ && cp -r src/html dist/ && cp -r src/css dist/"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^5.0.7",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.2",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

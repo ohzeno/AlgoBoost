@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/js",
+    "module": "ESNext",
+    "target": "es2019",
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"]
+}
