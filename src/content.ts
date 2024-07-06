@@ -1,7 +1,9 @@
+import { getBaekjoonExample } from "./utils/baekjoonUtils";
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // if (message === "getExampleTxt")
-  //   getExampleTxt().then((exampleTxt) => {
-  //     sendResponse(exampleTxt);
-  //   });
-  // return true;
+  if (message === "getBaekjoonExample")
+    getBaekjoonExample()
+      .then(sendResponse)
+      .catch((error) => sendResponse(null));
+  return true;
 });
