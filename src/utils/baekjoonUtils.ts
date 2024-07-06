@@ -1,25 +1,35 @@
-import { createSection, addFeatureToSection } from "./uiUtils";
+import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight } from "./tabUtils";
 import { BAEKJOON } from "../constants";
-import { sendMessageToBackground } from "./messageUtils";
+import { sendMessageToTab } from "./messageUtils";
 
-export function createBaekjoonSection() {
+export function createBaekjoonSection(): void {
   const section = createSection("백준");
 
-  addFeatureToSection(section, "맞힌 사람", "띄우기", "solved-users-btn");
-  const solvedUsersBtn = section.querySelector("#solved-users-btn");
-  solvedUsersBtn.addEventListener("click", () =>
-    sendMessageToBackground("solvedUsers")
+  createFeatureBtn(
+    section,
+    "맞힌 사람",
+    async () => await handleBaekjoonTab("Solved Users")
   );
 
-  addFeatureToSection(section, "숏코딩", "띄우기", "short-coding-btn");
-  const shortCodingBtn = section.querySelector("#short-coding-btn");
-  shortCodingBtn.addEventListener("click", () =>
-    sendMessageToBackground("shortCoding")
+  createFeatureBtn(
+    section,
+    "숏코딩",
+    async () => await handleBaekjoonTab("Short Coding")
   );
+
+  createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
 }
 
-function extractPageData(problemMatch, solverMatch, submitMatch) {
+function extractPageData(
+  problemMatch: RegExpMatchArray | null,
+  solverMatch: RegExpMatchArray | null,
+  submitMatch: RegExpMatchArray | null
+): {
+  problemNumber: string;
+  urlType: string | undefined;
+  languageNumber: string | undefined;
+} {
   let problemNumber, urlType, languageNumber;
 
   if (problemMatch) {
@@ -35,11 +45,16 @@ function extractPageData(problemMatch, solverMatch, submitMatch) {
   return { problemNumber, urlType, languageNumber };
 }
 
-function analyzePageUrl(url: string) {
+function analyzePageUrl(url: string): {
+  isValidPage: boolean;
+  problemNumber: string;
+  urlType: string | undefined;
+  languageNumber: string | undefined;
+} {
   const problemMatch = url.match(BAEKJOON.REGEX.problem);
   const solverMatch = url.match(BAEKJOON.REGEX.solver);
   const submitMatch = url.match(BAEKJOON.REGEX.submit);
-  const isValidPage = problemMatch || solverMatch || submitMatch;
+  const isValidPage = !!(problemMatch || solverMatch || submitMatch);
   return {
     isValidPage,
     ...extractPageData(problemMatch, solverMatch, submitMatch),
@@ -65,7 +80,7 @@ function getOrder(
   return "NEW_TAB";
 }
 
-export async function handleBaekjoonTab(type: baekjoonTabType) {
+async function handleBaekjoonTab(type: baekjoonTabType) {
   const { id, url, index } = await getActiveTab();
   const pageInfo = analyzePageUrl(url);
   if (!pageInfo.isValidPage) {
@@ -91,4 +106,49 @@ export async function handleBaekjoonTab(type: baekjoonTabType) {
 function getNewUrl(tabType: string, problemNumber: string): string {
   const typeStr = tabType === "Solved Users" ? "problem" : "short";
   return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
+}
+
+async function copyBaekjoonExample(): Promise<void> {
+  const exampleText = await sendMessageToTab("getBaekjoonExample");
+  if (!exampleText) {
+    // showNotification("Failed to get example code");
+    return;
+  }
+  navigator.clipboard
+    .writeText(exampleText)
+    .then(() => {
+      // showNotification("Example Text copied to clipboard!");
+    })
+    .catch((err: Error) => {
+      // showNotification(`Error: ${err.message}`);
+    });
+}
+
+export async function getBaekjoonExample(): Promise<string> {
+  const exampleElems = document.querySelectorAll(".sampledata");
+  const exampleData = parseExampleElements(exampleElems);
+  return formatExampleData(exampleData);
+}
+
+function parseExampleElements(elements: NodeListOf<Element>): ExampleData[] {
+  const exampleData: ExampleData[] = [];
+  for (let i = 0; i < elements.length; i += 2) {
+    const inputElem = elements[i];
+    const outputElem = elements[i + 1];
+    exampleData.push({
+      data: inputElem.textContent?.trim() ?? "",
+      answer: outputElem.textContent?.trim() ?? "",
+    });
+  }
+  return exampleData;
+}
+
+function formatExampleData(exampleData: ExampleData[]): string {
+  const formattedData = exampleData
+    .map(
+      ({ data, answer }) =>
+        `    {"data": """${data}""", "answer": """${answer}"""}`
+    )
+    .join(",\n");
+  return `inputdatas = [\n${formattedData}\n]`;
 }
