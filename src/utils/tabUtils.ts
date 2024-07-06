@@ -35,3 +35,8 @@ export async function updateTabsWithDelay(
     updateTabUrl(tab, curNum);
   }
 }
+
+export async function getPageUrl(): Promise<string> {
+  const activeTab = await getActiveTab();
+  return activeTab.url;
+}
