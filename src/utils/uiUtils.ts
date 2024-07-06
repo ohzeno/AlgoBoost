@@ -12,28 +12,17 @@ export function createSection(title: string): HTMLElement {
   return section;
 }
 
-export function addFeatureToSection(
+export function createFeatureBtn(
   section: HTMLElement,
   featureName: string,
-  buttonText: string,
-  buttonId: string
+  onClick: () => void
 ): void {
-  const feature = document.createElement("div");
-  feature.className = "feature";
-
-  const nameSpan = document.createElement("span");
-  nameSpan.className = "feature-name";
-  nameSpan.textContent = featureName;
-
-  feature.appendChild(nameSpan);
-
   const button = document.createElement("button");
   button.className = "feature-button";
-  button.textContent = buttonText;
-  button.id = buttonId;
+  button.textContent = featureName; // 버튼 안에 기능 이름 넣기
+  button.addEventListener("click", onClick); // 클릭 이벤트 추가
 
-  feature.appendChild(button);
-  section.appendChild(feature);
+  section.appendChild(button); // 버튼을 섹션에 추가
 }
 
 export function handleAbleChange(

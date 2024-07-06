@@ -8,11 +8,16 @@ body.dark-mode {
 }
 
 .dark-mode .section {
+  display: flex;
+  flex-direction: row; /* 가로로 버튼 배열 */
+  flex-wrap: wrap; /* 버튼들이 가로 공간을 다 쓰면 다음 줄로 넘어가도록 */
+  gap: 10px; /* 버튼 간격 조정 */
+  position: relative;
+  margin-top: 5px;
+  margin-bottom: 5px;
   border: 1px solid #444;
   border-radius: 10px;
   padding: 15px 10px 10px;
-  margin-bottom: 10px;
-  position: relative;
 }
 
 .dark-mode .section-title {
@@ -25,21 +30,8 @@ body.dark-mode {
   font-size: 16px;
 }
 
-.dark-mode .feature {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #333;
-  border-radius: 5px;
-  padding: 5px;
-  margin-bottom: 5px;
-}
-
-.dark-mode .feature-name {
-  flex-grow: 1;
-}
-
 .dark-mode .feature-button {
+  flex: 0 1 auto; /* 버튼이 가로로 늘어나도록 */
   padding: 5px 10px;
   background-color: #333;
   color: #ffffff;
@@ -50,27 +42,4 @@ body.dark-mode {
 
 .dark-mode .feature-button:hover {
   background-color: #444;
-}
-
-.dark-mode .number-input-container {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-}
-
-.dark-mode .number-input-checkbox {
-  margin-right: 5px;
-}
-
-.dark-mode .number-input {
-  width: 50px;
-  background-color: #333;
-  color: #ffffff;
-  border: 1px solid #444;
-  border-radius: 3px;
-  padding: 2px 5px;
-}
-
-.dark-mode .number-input:disabled {
-  opacity: 0.5;
 }

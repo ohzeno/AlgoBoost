@@ -1,4 +1,4 @@
-import { createSection, addFeatureToSection } from "./uiUtils";
+import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight } from "./tabUtils";
 import { BAEKJOON } from "../constants";
 import { sendMessageToBackground } from "./messageUtils";
@@ -6,15 +6,11 @@ import { sendMessageToBackground } from "./messageUtils";
 export function createBaekjoonSection() {
   const section = createSection("백준");
 
-  addFeatureToSection(section, "맞힌 사람", "띄우기", "solved-users-btn");
-  const solvedUsersBtn = section.querySelector("#solved-users-btn");
-  solvedUsersBtn.addEventListener("click", () =>
+  createFeatureBtn(section, "맞힌 사람", () =>
     sendMessageToBackground("solvedUsers")
   );
 
-  addFeatureToSection(section, "숏코딩", "띄우기", "short-coding-btn");
-  const shortCodingBtn = section.querySelector("#short-coding-btn");
-  shortCodingBtn.addEventListener("click", () =>
+  createFeatureBtn(section, "숏코딩", () =>
     sendMessageToBackground("shortCoding")
   );
 }
