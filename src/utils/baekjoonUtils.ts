@@ -1,9 +1,29 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
-import { getActiveTab, createNewTabToRight } from "./tabUtils";
+import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { BAEKJOON } from "../constants";
 import { sendMessageToTab } from "./messageUtils";
 
-export function createBaekjoonSection(): void {
+function getMatches(url: string): BaekjoonRegExpMatches {
+  return {
+    problemMatch: url.match(BAEKJOON.REGEX.problem),
+    solverMatch: url.match(BAEKJOON.REGEX.solver),
+    submitMatch: url.match(BAEKJOON.REGEX.submit),
+  };
+}
+
+async function validatePage(): Promise<boolean> {
+  const pageUrl: string = await getPageUrl();
+  const { problemMatch, solverMatch, submitMatch } = getMatches(pageUrl);
+  const isValidPage = !!(problemMatch || solverMatch || submitMatch);
+  if (isValidPage) return true;
+  // showNotification("This is not a Baekjoon page");
+  return false;
+}
+
+export async function createBaekjoonSection(): Promise<void> {
+  const isValidPage = await validatePage();
+  if (!isValidPage) return;
+
   const section = createSection("백준");
 
   createFeatureBtn(
@@ -21,15 +41,12 @@ export function createBaekjoonSection(): void {
   createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
 }
 
-function extractPageData(
-  problemMatch: RegExpMatchArray | null,
-  solverMatch: RegExpMatchArray | null,
-  submitMatch: RegExpMatchArray | null
-): {
+function getPageInfo(url: string): {
   problemNumber: string;
   urlType: string | undefined;
   languageNumber: string | undefined;
 } {
+  const { problemMatch, solverMatch, submitMatch } = getMatches(url);
   let problemNumber, urlType, languageNumber;
 
   if (problemMatch) {
@@ -43,22 +60,6 @@ function extractPageData(
   }
 
   return { problemNumber, urlType, languageNumber };
-}
-
-function analyzePageUrl(url: string): {
-  isValidPage: boolean;
-  problemNumber: string;
-  urlType: string | undefined;
-  languageNumber: string | undefined;
-} {
-  const problemMatch = url.match(BAEKJOON.REGEX.problem);
-  const solverMatch = url.match(BAEKJOON.REGEX.solver);
-  const submitMatch = url.match(BAEKJOON.REGEX.submit);
-  const isValidPage = !!(problemMatch || solverMatch || submitMatch);
-  return {
-    isValidPage,
-    ...extractPageData(problemMatch, solverMatch, submitMatch),
-  };
 }
 
 function getOrder(
@@ -82,11 +83,7 @@ function getOrder(
 
 async function handleBaekjoonTab(type: baekjoonTabType) {
   const { id, url, index } = await getActiveTab();
-  const pageInfo = analyzePageUrl(url);
-  if (!pageInfo.isValidPage) {
-    // showNotification("This is not a Baekjoon problem page");
-    return;
-  }
+  const pageInfo = getPageInfo(url);
   const { problemNumber, urlType, languageNumber } = pageInfo;
   const newUrl = getNewUrl(type, problemNumber);
   const order = getOrder(type, urlType, languageNumber);

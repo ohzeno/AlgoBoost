@@ -1,7 +1,7 @@
 import { createBaekjoonSection } from "./utils/baekjoonUtils";
 
-function initializePopup(): void {
-  createBaekjoonSection();
+async function initializePopup(): Promise<void> {
+  await createBaekjoonSection();
 }
 
 initializePopup();
