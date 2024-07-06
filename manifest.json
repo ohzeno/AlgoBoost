@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AlgoBoost",
   "version": "1.0",
-  "permissions": ["tabs", "activeTab", "storage", "bookmarks"],
+  "permissions": ["tabs", "activeTab", "storage"],
   "background": {
     "service_worker": "js/background.js"
   },

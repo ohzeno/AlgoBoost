@@ -24,10 +24,3 @@ export function createFeatureBtn(
 
   section.appendChild(button); // 버튼을 섹션에 추가
 }
-
-export function handleAbleChange(
-  event,
-  targetElement: HTMLInputElement | HTMLButtonElement
-) {
-  targetElement.disabled = !event.target.checked;
-}

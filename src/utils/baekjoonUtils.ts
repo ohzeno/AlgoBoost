@@ -1,18 +1,24 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight } from "./tabUtils";
 import { BAEKJOON } from "../constants";
-import { sendMessageToBackground } from "./messageUtils";
+import { sendMessageToTab } from "./messageUtils";
 
 export function createBaekjoonSection() {
   const section = createSection("백준");
 
-  createFeatureBtn(section, "맞힌 사람", () =>
-    sendMessageToBackground("solvedUsers")
+  createFeatureBtn(
+    section,
+    "맞힌 사람",
+    async () => await handleBaekjoonTab("Solved Users")
   );
 
-  createFeatureBtn(section, "숏코딩", () =>
-    sendMessageToBackground("shortCoding")
+  createFeatureBtn(
+    section,
+    "숏코딩",
+    async () => await handleBaekjoonTab("Short Coding")
   );
+
+  createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
 }
 
 function extractPageData(problemMatch, solverMatch, submitMatch) {
@@ -61,7 +67,7 @@ function getOrder(
   return "NEW_TAB";
 }
 
-export async function handleBaekjoonTab(type: baekjoonTabType) {
+async function handleBaekjoonTab(type: baekjoonTabType) {
   const { id, url, index } = await getActiveTab();
   const pageInfo = analyzePageUrl(url);
   if (!pageInfo.isValidPage) {
@@ -87,4 +93,8 @@ export async function handleBaekjoonTab(type: baekjoonTabType) {
 function getNewUrl(tabType: string, problemNumber: string): string {
   const typeStr = tabType === "Solved Users" ? "problem" : "short";
   return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
+}
+
+async function copyBaekjoonExample() {
+  // const exampleTxt = await sendMessageToTab("getBaekjoonExample");
 }
