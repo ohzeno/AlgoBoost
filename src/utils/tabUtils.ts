@@ -19,23 +19,6 @@ export async function createNewTabToRight(
   await chrome.tabs.create({ url: newUrl, index: index + 1 });
 }
 
-function updateTabUrl(tabData: [string, chrome.tabs.Tab], curNum: string) {
-  const [urlNum, tab] = tabData;
-  const newUrl = tab.url.replace(urlNum, curNum);
-  chrome.tabs.update(tab.id, { url: newUrl });
-}
-
-export async function updateTabsWithDelay(
-  tabsToUpdate: [string, chrome.tabs.Tab][],
-  delay: number,
-  curNum: string
-) {
-  for (let tab of tabsToUpdate) {
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    updateTabUrl(tab, curNum);
-  }
-}
-
 export async function getPageUrl(): Promise<string> {
   const activeTab = await getActiveTab();
   return activeTab.url;
