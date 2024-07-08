@@ -2,6 +2,7 @@ import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { BAEKJOON } from "../constants";
 import { sendMessageToTab } from "./messageUtils";
+import { divMod } from "./mathUtils";
 
 function getMatches(url: string): BaekjoonRegExpMatches {
   return {
@@ -39,6 +40,7 @@ export async function createBaekjoonSection(): Promise<void> {
   );
 
   createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
+  createFeatureBtn(section, "양식 복사", copyBaekjoonFormat);
 }
 
 function getPageInfo(url: string): {
@@ -108,7 +110,7 @@ function getNewUrl(tabType: string, problemNumber: string): string {
 async function copyBaekjoonExample(): Promise<void> {
   const exampleText = await sendMessageToTab("getBaekjoonExample");
   if (!exampleText) {
-    // showNotification("Failed to get example code");
+    // showNotification("Failed to get example");
     return;
   }
   navigator.clipboard
@@ -148,4 +150,20 @@ function formatExampleData(exampleData: ExampleData[]): string {
     )
     .join(",\n");
   return `inputdatas = [\n${formattedData}\n]`;
+}
+
+async function copyBaekjoonFormat(): Promise<void> {
+  const formatText = await sendMessageToTab("getBaekjoonFormat");
+  if (!formatText) {
+    // showNotification("Failed to get format");
+    return;
+  }
+  navigator.clipboard
+    .writeText(formatText)
+    .then(() => {
+      // showNotification("Format Text copied to clipboard!");
+    })
+    .catch((err: Error) => {
+      // showNotification(`Error: ${err.message}`);
+    });
 }
