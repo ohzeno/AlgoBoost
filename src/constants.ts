@@ -10,4 +10,6 @@ export const BAEKJOON = {
   LANG_CODES: {
     PYTHON: "1003",
   },
+  TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
+  RANKS: ["V", "IV", "III", "II", "I"],
 };

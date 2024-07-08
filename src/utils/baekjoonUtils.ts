@@ -167,3 +167,43 @@ async function copyBaekjoonFormat(): Promise<void> {
       // showNotification(`Error: ${err.message}`);
     });
 }
+
+export async function getBaekjoonFormat() {
+  /*
+  # https://www.acmicpc.net/problem/1956
+  import sys
+  # sys.stdin = open('input.txt')
+  def input():
+      return sys.stdin.readline().rstrip()
+  """
+  """
+
+
+
+  """
+  현 시점 실버 1. 제출 950. 정답률 31.761 %
+  """
+  */
+
+  const tierStr = getTierStr();
+}
+
+function getTierStr(): string {
+  const tierElement = document.querySelector("img.solvedac-tier");
+  if (!tierElement) {
+    // showNotification("Failed to get tierElement");
+    return null;
+  }
+  const src = tierElement.getAttribute("src");
+  const match = src.match(/tier\/(\d+)\.svg/);
+  if (!match) {
+    // showNotification("Failed to get tierMatch");
+    return null;
+  }
+  const tierNum = parseInt(match[1]) - 1;
+  if (tierNum < 0 || tierNum > 29) return "Invalid Tier";
+  const [tierIdx, rankIdx] = divMod(tierNum, 5);
+  const tier = BAEKJOON.TIERS[tierIdx];
+  const rank = BAEKJOON.RANKS[rankIdx];
+  return `${tier} ${rank}`;
+}
