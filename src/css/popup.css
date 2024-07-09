@@ -32,7 +32,7 @@ body.dark-mode {
 
 .dark-mode .feature-button {
   flex: 0 1 auto; /* 버튼이 가로로 늘어나도록 */
-  padding: 5px 10px;
+  padding: 5px;
   background-color: #333;
   color: #ffffff;
   border: none;

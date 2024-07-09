@@ -1,9 +1,31 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
-import { getActiveTab, createNewTabToRight } from "./tabUtils";
+import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { BAEKJOON } from "../constants";
 import { sendMessageToTab } from "./messageUtils";
+import { divMod } from "./mathUtils";
+import { copyTextToClipboard } from "./clipboardUtils";
 
-export function createBaekjoonSection(): void {
+function getMatches(url: string): BaekjoonRegExpMatches {
+  return {
+    problemMatch: url.match(BAEKJOON.REGEX.problem),
+    solverMatch: url.match(BAEKJOON.REGEX.solver),
+    submitMatch: url.match(BAEKJOON.REGEX.submit),
+  };
+}
+
+async function validatePage(): Promise<boolean> {
+  const pageUrl: string = await getPageUrl();
+  const { problemMatch, solverMatch, submitMatch } = getMatches(pageUrl);
+  const isValidPage = !!(problemMatch || solverMatch || submitMatch);
+  if (isValidPage) return true;
+  // showNotification("This is not a Baekjoon page");
+  return false;
+}
+
+export async function createBaekjoonSection(): Promise<void> {
+  const isValidPage = await validatePage();
+  if (!isValidPage) return;
+
   const section = createSection("백준");
 
   createFeatureBtn(
@@ -18,18 +40,24 @@ export function createBaekjoonSection(): void {
     async () => await handleBaekjoonTab("Short Coding")
   );
 
-  createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
+  createFeatureBtn(
+    section,
+    "예제 복사",
+    async () => await copyTextToClipboard("getBaekjoonExample")
+  );
+  createFeatureBtn(
+    section,
+    "양식 복사",
+    async () => await copyTextToClipboard("getBaekjoonFormat")
+  );
 }
 
-function extractPageData(
-  problemMatch: RegExpMatchArray | null,
-  solverMatch: RegExpMatchArray | null,
-  submitMatch: RegExpMatchArray | null
-): {
+function getPageInfo(url: string): {
   problemNumber: string;
   urlType: string | undefined;
   languageNumber: string | undefined;
 } {
+  const { problemMatch, solverMatch, submitMatch } = getMatches(url);
   let problemNumber, urlType, languageNumber;
 
   if (problemMatch) {
@@ -43,22 +71,6 @@ function extractPageData(
   }
 
   return { problemNumber, urlType, languageNumber };
-}
-
-function analyzePageUrl(url: string): {
-  isValidPage: boolean;
-  problemNumber: string;
-  urlType: string | undefined;
-  languageNumber: string | undefined;
-} {
-  const problemMatch = url.match(BAEKJOON.REGEX.problem);
-  const solverMatch = url.match(BAEKJOON.REGEX.solver);
-  const submitMatch = url.match(BAEKJOON.REGEX.submit);
-  const isValidPage = !!(problemMatch || solverMatch || submitMatch);
-  return {
-    isValidPage,
-    ...extractPageData(problemMatch, solverMatch, submitMatch),
-  };
 }
 
 function getOrder(
@@ -82,11 +94,7 @@ function getOrder(
 
 async function handleBaekjoonTab(type: baekjoonTabType) {
   const { id, url, index } = await getActiveTab();
-  const pageInfo = analyzePageUrl(url);
-  if (!pageInfo.isValidPage) {
-    // showNotification("This is not a Baekjoon problem page");
-    return;
-  }
+  const pageInfo = getPageInfo(url);
   const { problemNumber, urlType, languageNumber } = pageInfo;
   const newUrl = getNewUrl(type, problemNumber);
   const order = getOrder(type, urlType, languageNumber);
@@ -108,24 +116,14 @@ function getNewUrl(tabType: string, problemNumber: string): string {
   return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
 }
 
-async function copyBaekjoonExample(): Promise<void> {
-  const exampleText = await sendMessageToTab("getBaekjoonExample");
-  if (!exampleText) {
-    // showNotification("Failed to get example code");
-    return;
+export function getBaekjoonExample(): string {
+  const exampleElems = document.querySelectorAll(
+    BAEKJOON.SELECTOR.exampleElems
+  );
+  if (!exampleElems || exampleElems.length === 0) {
+    // showNotification("Failed to get exampleElems");
+    return null;
   }
-  navigator.clipboard
-    .writeText(exampleText)
-    .then(() => {
-      // showNotification("Example Text copied to clipboard!");
-    })
-    .catch((err: Error) => {
-      // showNotification(`Error: ${err.message}`);
-    });
-}
-
-export async function getBaekjoonExample(): Promise<string> {
-  const exampleElems = document.querySelectorAll(".sampledata");
   const exampleData = parseExampleElements(exampleElems);
   return formatExampleData(exampleData);
 }
@@ -151,4 +149,67 @@ function formatExampleData(exampleData: ExampleData[]): string {
     )
     .join(",\n");
   return `inputdatas = [\n${formattedData}\n]`;
+}
+
+export function getBaekjoonFormat(): string {
+  const upperPart = getUpperPart();
+  const lowerPart = getLowerPart();
+  return `${upperPart}\n\n\n\n${lowerPart}\n`;
+}
+
+function getUpperPart(): string {
+  /* content스크립트 -> getBaekjoonFormat -> getUpperPart
+    content script에서 실행되므로 chrome.tabs API를 사용할 수 없음.
+    대신 window.location.href를 사용하여 현재 url을 가져옴.
+  */
+  const curUrl = window.location.href;
+  return BAEKJOON.TEMPLATE.UPPER.replace("{URL}", curUrl);
+}
+
+function getLowerPart(): string {
+  const tierStr = getTierStr();
+  const { subCnt, accRate } = getStat();
+  return BAEKJOON.TEMPLATE.LOWER.replace("{TIER}", tierStr)
+    .replace("{SUBCNT}", subCnt)
+    .replace("{ACCRATE}", accRate);
+}
+
+function getTierStr(): string {
+  const tierElement = document.querySelector<HTMLImageElement>(
+    BAEKJOON.SELECTOR.tier
+  );
+  if (!tierElement?.src) {
+    // showNotification("Failed to get tierElement src");
+    return null;
+  }
+  const match = tierElement.src.match(BAEKJOON.REGEX.tier);
+  if (!match) {
+    // showNotification("Failed to get tierMatch");
+    return null;
+  }
+  const tierNum = parseInt(match[1]) - 1;
+  if (tierNum < 0 || tierNum > 29) return "Invalid Tier";
+  const [tierIdx, rankIdx] = divMod(tierNum, 5);
+  const tier = BAEKJOON.TIERS[tierIdx];
+  const rank = BAEKJOON.RANKS[rankIdx];
+  return `${tier} ${rank}`;
+}
+
+function getStat(): BaekjoonProblemStats {
+  const tdElems = document.querySelectorAll(BAEKJOON.SELECTOR.tdElems);
+  if (!tdElems || tdElems.length < 6) {
+    // showNotification("Failed to get table");
+    return null;
+  }
+  const subCnt = tdElems[3].textContent.trim();
+  const accRate = tdElems[5].textContent.trim().slice(0, -1);
+  return { subCnt: subCnt, accRate: accRate };
+}
+
+export function handleBaekjoonRequest(requestFunction) {
+  try {
+    return requestFunction();
+  } catch (error) {
+    return null;
+  }
 }
