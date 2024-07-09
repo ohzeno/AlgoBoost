@@ -6,9 +6,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then(sendResponse)
       .catch((error) => sendResponse(null));
   } else if (message === "getBaekjoonFormat") {
-    getBaekjoonFormat()
-      .then(sendResponse)
-      .catch((error) => sendResponse(null));
+    try {
+      const baekjoonFormat = getBaekjoonFormat();
+      sendResponse(baekjoonFormat);
+    } catch (error) {
+      sendResponse(null);
+    }
   }
   return true;
 });

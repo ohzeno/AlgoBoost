@@ -124,7 +124,13 @@ async function copyBaekjoonExample(): Promise<void> {
 }
 
 export async function getBaekjoonExample(): Promise<string> {
-  const exampleElems = document.querySelectorAll(".sampledata");
+  const exampleElems = document.querySelectorAll(
+    BAEKJOON.SELECTOR.exampleElems
+  );
+  if (!exampleElems || exampleElems.length === 0) {
+    // showNotification("Failed to get exampleElems");
+    return null;
+  }
   const exampleData = parseExampleElements(exampleElems);
   return formatExampleData(exampleData);
 }
@@ -168,45 +174,49 @@ async function copyBaekjoonFormat(): Promise<void> {
     });
 }
 
-export async function getBaekjoonFormat() {
-  /*
-  # https://www.acmicpc.net/problem/1956
-  import sys
-  # sys.stdin = open('input.txt')
-  def input():
-      return sys.stdin.readline().rstrip()
-  """
-  """
-
-
-
-  """
-  현 시점 실버 1. 제출 950. 정답률 31.761 %
-  """
-  */
+export function getBaekjoonFormat() {
   const upperPart = getUpperPart();
+  const lowerPart = getLowerPart();
+  return `${upperPart}\n\n\n\n${lowerPart}\n`;
 }
 
 function getUpperPart(): string {
-  const curUrl = getPageUrl();
-  return `/*
-  # ${curUrl}
-  import sys
-  # sys.stdin = open('input.txt')
-  def input():
-      return sys.stdin.readline().rstrip()
-  """
-  """`;
+  /* content스크립트 -> getBaekjoonFormat -> getUpperPart
+    content script에서 실행되므로 chrome.tabs API를 사용할 수 없음.
+    대신 window.location.href를 사용하여 현재 url을 가져옴.
+  */
+  const curUrl = window.location.href;
+  return BAEKJOON.TEMPLATE.UPPER.replace("{URL}", curUrl);
+  // return `/*
+  // # ${curUrl}
+  // import sys
+  // # sys.stdin = open('input.txt')
+  // def input():
+  //     return sys.stdin.readline().rstrip()
+  // """
+  // """`;
+}
+
+function getLowerPart(): string {
+  const tierStr = getTierStr();
+  const { subCnt, accRate } = getStat();
+  return BAEKJOON.TEMPLATE.LOWER.replace("{TIER}", tierStr)
+    .replace("{SUBCNT}", subCnt)
+    .replace("{ACCRATE}", accRate);
+  // return `"""
+  // 현 시점 ${tierStr}. 제출 ${subCnt}. 정답률 ${accRate} %
+  // """`;
 }
 
 function getTierStr(): string {
-  const tierElement = document.querySelector("img.solvedac-tier");
-  if (!tierElement) {
-    // showNotification("Failed to get tierElement");
+  const tierElement = document.querySelector<HTMLImageElement>(
+    BAEKJOON.SELECTOR.tier
+  );
+  if (!tierElement?.src) {
+    // showNotification("Failed to get tierElement src");
     return null;
   }
-  const src = tierElement.getAttribute("src");
-  const match = src.match(/tier\/(\d+)\.svg/);
+  const match = tierElement.src.match(BAEKJOON.REGEX.tier);
   if (!match) {
     // showNotification("Failed to get tierMatch");
     return null;
@@ -217,4 +227,15 @@ function getTierStr(): string {
   const tier = BAEKJOON.TIERS[tierIdx];
   const rank = BAEKJOON.RANKS[rankIdx];
   return `${tier} ${rank}`;
+}
+
+function getStat(): BaekjoonProblemStats {
+  const tdElems = document.querySelectorAll(BAEKJOON.SELECTOR.tdElems);
+  if (!tdElems || tdElems.length < 6) {
+    // showNotification("Failed to get table");
+    return null;
+  }
+  const subCnt = tdElems[3].textContent.trim();
+  const accRate = tdElems[5].textContent.trim().slice(0, -1);
+  return { subCnt: subCnt, accRate: accRate };
 }

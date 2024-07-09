@@ -10,3 +10,8 @@ interface BaekjoonRegExpMatches {
   solverMatch: RegExpMatchArray | null;
   submitMatch: RegExpMatchArray | null;
 }
+
+interface BaekjoonProblemStats {
+  subCnt: string;
+  accRate: string;
+}
