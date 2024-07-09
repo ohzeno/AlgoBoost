@@ -3,6 +3,7 @@ import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { BAEKJOON } from "../constants";
 import { sendMessageToTab } from "./messageUtils";
 import { divMod } from "./mathUtils";
+import { copyTextToClipboard } from "./clipboardUtils";
 
 function getMatches(url: string): BaekjoonRegExpMatches {
   return {
@@ -39,8 +40,16 @@ export async function createBaekjoonSection(): Promise<void> {
     async () => await handleBaekjoonTab("Short Coding")
   );
 
-  createFeatureBtn(section, "예제 복사", copyBaekjoonExample);
-  createFeatureBtn(section, "양식 복사", copyBaekjoonFormat);
+  createFeatureBtn(
+    section,
+    "예제 복사",
+    async () => await copyTextToClipboard("getBaekjoonExample")
+  );
+  createFeatureBtn(
+    section,
+    "양식 복사",
+    async () => await copyTextToClipboard("getBaekjoonFormat")
+  );
 }
 
 function getPageInfo(url: string): {
@@ -107,22 +116,6 @@ function getNewUrl(tabType: string, problemNumber: string): string {
   return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
 }
 
-async function copyBaekjoonExample(): Promise<void> {
-  const exampleText = await sendMessageToTab("getBaekjoonExample");
-  if (!exampleText) {
-    // showNotification("Failed to get example");
-    return;
-  }
-  navigator.clipboard
-    .writeText(exampleText)
-    .then(() => {
-      // showNotification("Example Text copied to clipboard!");
-    })
-    .catch((err: Error) => {
-      // showNotification(`Error: ${err.message}`);
-    });
-}
-
 export function getBaekjoonExample(): string {
   const exampleElems = document.querySelectorAll(
     BAEKJOON.SELECTOR.exampleElems
@@ -158,23 +151,7 @@ function formatExampleData(exampleData: ExampleData[]): string {
   return `inputdatas = [\n${formattedData}\n]`;
 }
 
-async function copyBaekjoonFormat(): Promise<void> {
-  const formatText = await sendMessageToTab("getBaekjoonFormat");
-  if (!formatText) {
-    // showNotification("Failed to get format");
-    return;
-  }
-  navigator.clipboard
-    .writeText(formatText)
-    .then(() => {
-      // showNotification("Format Text copied to clipboard!");
-    })
-    .catch((err: Error) => {
-      // showNotification(`Error: ${err.message}`);
-    });
-}
-
-export function getBaekjoonFormat() {
+export function getBaekjoonFormat(): string {
   const upperPart = getUpperPart();
   const lowerPart = getLowerPart();
   return `${upperPart}\n\n\n\n${lowerPart}\n`;
