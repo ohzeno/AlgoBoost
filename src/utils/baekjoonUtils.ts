@@ -205,3 +205,11 @@ function getStat(): BaekjoonProblemStats {
   const accRate = tdElems[5].textContent.trim().slice(0, -1);
   return { subCnt: subCnt, accRate: accRate };
 }
+
+export function handleBaekjoonRequest(requestFunction) {
+  try {
+    return requestFunction();
+  } catch (error) {
+    return null;
+  }
+}
