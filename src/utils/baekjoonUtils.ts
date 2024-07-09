@@ -123,7 +123,7 @@ async function copyBaekjoonExample(): Promise<void> {
     });
 }
 
-export async function getBaekjoonExample(): Promise<string> {
+export function getBaekjoonExample(): string {
   const exampleElems = document.querySelectorAll(
     BAEKJOON.SELECTOR.exampleElems
   );
@@ -187,14 +187,6 @@ function getUpperPart(): string {
   */
   const curUrl = window.location.href;
   return BAEKJOON.TEMPLATE.UPPER.replace("{URL}", curUrl);
-  // return `/*
-  // # ${curUrl}
-  // import sys
-  // # sys.stdin = open('input.txt')
-  // def input():
-  //     return sys.stdin.readline().rstrip()
-  // """
-  // """`;
 }
 
 function getLowerPart(): string {
@@ -203,9 +195,6 @@ function getLowerPart(): string {
   return BAEKJOON.TEMPLATE.LOWER.replace("{TIER}", tierStr)
     .replace("{SUBCNT}", subCnt)
     .replace("{ACCRATE}", accRate);
-  // return `"""
-  // 현 시점 ${tierStr}. 제출 ${subCnt}. 정답률 ${accRate} %
-  // """`;
 }
 
 function getTierStr(): string {
