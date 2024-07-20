@@ -30,4 +30,25 @@ def input():
     tier: "img.solvedac-tier",
     tdElems: "#problem-info > tbody > tr > td",
   },
+  COMMANDS: {
+    GET_EXAMPLE: "getBaekjoonExample",
+    GET_FORMAT: "getBaekjoonFormat",
+  },
+  TAB_TYPES: {
+    SOLVED_USERS: "Solved Users",
+    SHORT_CODING: "Short Coding",
+  } as const,
+};
+
+export const LEETCODE = {
+  BASE_URL: "https://leetcode.com",
+  REGEX: {
+    problem: /^https:\/\/leetcode\.com\/problems\/.+/,
+  },
+  TEMPLATE: {},
+  SELECTOR: {},
+  COMMANDS: {
+    GET_EXAMPLE: "getLeetcodeExample",
+    GET_FORMAT: "getLeetcodeFormat",
+  },
 };

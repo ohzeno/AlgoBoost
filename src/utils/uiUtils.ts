@@ -19,8 +19,8 @@ export function createFeatureBtn(
 ): void {
   const button = document.createElement("button");
   button.className = "feature-button";
-  button.textContent = featureName; // 버튼 안에 기능 이름 넣기
-  button.addEventListener("click", onClick); // 클릭 이벤트 추가
+  button.textContent = featureName;
+  button.addEventListener("click", onClick);
 
-  section.appendChild(button); // 버튼을 섹션에 추가
+  section.appendChild(button);
 }

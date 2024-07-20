@@ -3,12 +3,12 @@
   "name": "AlgoBoost",
   "version": "1.0",
   "permissions": ["tabs", "activeTab", "storage"],
-  "background": {
-    "service_worker": "js/background.js"
-  },
   "content_scripts": [
     {
-      "matches": ["https://www.acmicpc.net/problem/*"],
+      "matches": [
+        "https://www.acmicpc.net/problem/*",
+        "https://leetcode.com/problems/*"
+      ],
       "js": ["js/content.js"]
     }
   ],
