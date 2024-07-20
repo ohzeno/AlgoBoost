@@ -30,24 +30,24 @@ export async function createBaekjoonSection(): Promise<void> {
   createFeatureBtn(
     section,
     "맞힌 사람",
-    async () => await handleBaekjoonTab("Solved Users")
+    async () => await handleBaekjoonTab(BAEKJOON.TAB_TYPES.SOLVED_USERS)
   );
 
   createFeatureBtn(
     section,
     "숏코딩",
-    async () => await handleBaekjoonTab("Short Coding")
+    async () => await handleBaekjoonTab(BAEKJOON.TAB_TYPES.SHORT_CODING)
   );
 
   createFeatureBtn(
     section,
     "예제 복사",
-    async () => await copyTextToClipboard("getBaekjoonExample")
+    async () => await copyTextToClipboard(BAEKJOON.COMMANDS.GET_EXAMPLE)
   );
   createFeatureBtn(
     section,
     "양식 복사",
-    async () => await copyTextToClipboard("getBaekjoonFormat")
+    async () => await copyTextToClipboard(BAEKJOON.COMMANDS.GET_FORMAT)
   );
 }
 
@@ -79,8 +79,8 @@ function getOrder(
 ): "SAME_PAGE" | "UPDATE_TAB" | "NEW_TAB" {
   const isSameType =
     urlType &&
-    ((type === "Solved Users" && urlType === "problem") ||
-      (type === "Short Coding" && urlType === "short"));
+    ((type === BAEKJOON.TAB_TYPES.SOLVED_USERS && urlType === "problem") ||
+      (type === BAEKJOON.TAB_TYPES.SHORT_CODING && urlType === "short"));
 
   if (isSameType)
     // 같은 페이지면 언어만 일치시켜주면 됨.
@@ -111,7 +111,8 @@ async function handleBaekjoonTab(type: baekjoonTabType) {
 }
 
 function getNewUrl(tabType: string, problemNumber: string): string {
-  const typeStr = tabType === "Solved Users" ? "problem" : "short";
+  const typeStr =
+    tabType === BAEKJOON.TAB_TYPES.SOLVED_USERS ? "problem" : "short";
   return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
 }
 
