@@ -47,4 +47,8 @@ export const LEETCODE = {
   },
   TEMPLATE: {},
   SELECTOR: {},
+  COMMANDS: {
+    GET_EXAMPLE: "getLeetcodeExample",
+    GET_FORMAT: "getLeetcodeFormat",
+  },
 };

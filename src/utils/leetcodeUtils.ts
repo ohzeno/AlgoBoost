@@ -21,13 +21,13 @@ export async function createLeetcodeSection(): Promise<void> {
   createFeatureBtn(
     section,
     "Copy Example",
-    // async () => await copyTextToClipboard("getLeetcodeExample")
-    () => console.log("getLeetcodeExample")
+    // async () => await copyTextToClipboard(LEETCODE.COMMANDS.GET_EXAMPLE)
+    () => console.log(LEETCODE.COMMANDS.GET_EXAMPLE)
   );
   createFeatureBtn(
     section,
     "Copy Format",
-    // async () => await copyTextToClipboard("getLeetcodeFormat")
-    () => console.log("getLeetcodeFormat")
+    // async () => await copyTextToClipboard(LEETCODE.COMMANDS.GET_FORMAT)
+    () => console.log(LEETCODE.COMMANDS.GET_FORMAT)
   );
 }
