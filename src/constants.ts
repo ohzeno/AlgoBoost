@@ -31,3 +31,12 @@ def input():
     tdElems: "#problem-info > tbody > tr > td",
   },
 };
+
+export const LEETCODE = {
+  BASE_URL: "https://leetcode.com",
+  REGEX: {
+    problem: /^https:\/\/leetcode\.com\/problems\/.+/,
+  },
+  TEMPLATE: {},
+  SELECTOR: {},
+};
