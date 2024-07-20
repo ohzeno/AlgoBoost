@@ -5,7 +5,7 @@ module.exports = {
   // mode: "production",
   devtool: "source-map", // eval()은 CSP 위반이라 source-map을 사용
   entry: {
-    background: "./src/background.ts",
+    // background: "./src/background.ts",
     popup: "./src/popup.ts",
     content: "./src/content.ts",
   },

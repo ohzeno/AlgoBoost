@@ -1,7 +1,6 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { BAEKJOON } from "../constants";
-import { sendMessageToTab } from "./messageUtils";
 import { divMod } from "./mathUtils";
 import { copyTextToClipboard } from "./clipboardUtils";
 
