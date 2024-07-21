@@ -13,7 +13,7 @@ export const BAEKJOON = {
   },
   TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
   RANKS: ["V", "IV", "III", "II", "I"],
-  TEMPLATE: {
+  TEMPLATES: {
     UPPER: `# {URL}
 import sys
 # sys.stdin = open('input.txt')
@@ -25,7 +25,7 @@ def input():
 현 시점 {TIER}. 제출 {SUBCNT}. 정답률 {ACCRATE} %
 """`,
   },
-  SELECTOR: {
+  SELECTORS: {
     exampleElems: ".sampledata",
     tier: "img.solvedac-tier",
     tdElems: "#problem-info > tbody > tr > td",
@@ -45,10 +45,50 @@ export const LEETCODE = {
   REGEX: {
     problem: /^https:\/\/leetcode\.com\/problems\/.+/,
   },
-  TEMPLATE: {},
-  SELECTOR: {},
+  TEMPLATES: {
+    UPPER: `# {URL}
+from typing import Optional, List
+
+"""
+constraints:
+{CONSTRAINTS}
+"""
+
+
+{BASE_CODE}`,
+    LOWER: `{INPUTDATAS}
+
+"""
+LeetCode {DIFFICULTY}.
+제출 {SUBMISSIONS}, 정답률 {ACCEPTANCERATE}%
+
+"""
+import inspect
+
+functions = [value for value in Solution.__dict__.values() if inspect.isfunction(value)]
+my_func = functions[0]
+sol = Solution()
+for inputdata in inputdatas:
+    data, ans = inputdata["data"], inputdata["answer"]
+    res = my_func(sol, *data)
+    if res == ans:
+        print("pass")
+    else:
+        summary = "fail"
+        for label, content in [("expected:", ans), ("got:", res)]:
+            summary += f"\n  {label}\n"
+            summary += f"    {content}\n"
+            summary = summary.rstrip()
+        print(summary)`,
+  },
+  SELECTORS: {
+    description: "#description_tabbar_outer",
+    title: 'div[class*="text-title-large"] a',
+    difficulty: 'div[class*="text-difficulty"]',
+  },
   COMMANDS: {
     GET_EXAMPLE: "getLeetcodeExample",
     GET_FORMAT: "getLeetcodeFormat",
+    GET_TITLE: "getLeetcodeTitle",
   },
 };
