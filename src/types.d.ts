@@ -1,6 +1,6 @@
 type baekjoonTabType = "Solved Users" | "Short Coding";
 
-interface ExampleData {
+interface BaekjoonExampleData {
   data: string;
   answer: string;
 }

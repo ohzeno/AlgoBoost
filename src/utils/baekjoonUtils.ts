@@ -128,8 +128,10 @@ export function getBaekjoonExample(): string {
   return formatExampleData(exampleData);
 }
 
-function parseExampleElements(elements: NodeListOf<Element>): ExampleData[] {
-  const exampleData: ExampleData[] = [];
+function parseExampleElements(
+  elements: NodeListOf<Element>
+): BaekjoonExampleData[] {
+  const exampleData: BaekjoonExampleData[] = [];
   for (let i = 0; i < elements.length; i += 2) {
     const inputElem = elements[i];
     const outputElem = elements[i + 1];
@@ -141,7 +143,7 @@ function parseExampleElements(elements: NodeListOf<Element>): ExampleData[] {
   return exampleData;
 }
 
-function formatExampleData(exampleData: ExampleData[]): string {
+function formatExampleData(exampleData: BaekjoonExampleData[]): string {
   const formattedData = exampleData
     .map(
       ({ data, answer }) =>
