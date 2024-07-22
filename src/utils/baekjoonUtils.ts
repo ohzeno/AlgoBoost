@@ -118,7 +118,7 @@ function getNewUrl(tabType: string, problemNumber: string): string {
 
 export function getBaekjoonExample(): string {
   const exampleElems = document.querySelectorAll(
-    BAEKJOON.SELECTOR.exampleElems
+    BAEKJOON.SELECTORS.exampleElems
   );
   if (!exampleElems || exampleElems.length === 0) {
     // showNotification("Failed to get exampleElems");
@@ -128,8 +128,10 @@ export function getBaekjoonExample(): string {
   return formatExampleData(exampleData);
 }
 
-function parseExampleElements(elements: NodeListOf<Element>): ExampleData[] {
-  const exampleData: ExampleData[] = [];
+function parseExampleElements(
+  elements: NodeListOf<Element>
+): BaekjoonExampleData[] {
+  const exampleData: BaekjoonExampleData[] = [];
   for (let i = 0; i < elements.length; i += 2) {
     const inputElem = elements[i];
     const outputElem = elements[i + 1];
@@ -141,7 +143,7 @@ function parseExampleElements(elements: NodeListOf<Element>): ExampleData[] {
   return exampleData;
 }
 
-function formatExampleData(exampleData: ExampleData[]): string {
+function formatExampleData(exampleData: BaekjoonExampleData[]): string {
   const formattedData = exampleData
     .map(
       ({ data, answer }) =>
@@ -163,20 +165,20 @@ function getUpperPart(): string {
     대신 window.location.href를 사용하여 현재 url을 가져옴.
   */
   const curUrl = window.location.href;
-  return BAEKJOON.TEMPLATE.UPPER.replace("{URL}", curUrl);
+  return BAEKJOON.TEMPLATES.UPPER.replace("{URL}", curUrl);
 }
 
 function getLowerPart(): string {
   const tierStr = getTierStr();
   const { subCnt, accRate } = getStat();
-  return BAEKJOON.TEMPLATE.LOWER.replace("{TIER}", tierStr)
+  return BAEKJOON.TEMPLATES.LOWER.replace("{TIER}", tierStr)
     .replace("{SUBCNT}", subCnt)
     .replace("{ACCRATE}", accRate);
 }
 
 function getTierStr(): string {
   const tierElement = document.querySelector<HTMLImageElement>(
-    BAEKJOON.SELECTOR.tier
+    BAEKJOON.SELECTORS.tier
   );
   if (!tierElement?.src) {
     // showNotification("Failed to get tierElement src");
@@ -196,7 +198,7 @@ function getTierStr(): string {
 }
 
 function getStat(): BaekjoonProblemStats {
-  const tdElems = document.querySelectorAll(BAEKJOON.SELECTOR.tdElems);
+  const tdElems = document.querySelectorAll(BAEKJOON.SELECTORS.tdElems);
   if (!tdElems || tdElems.length < 6) {
     // showNotification("Failed to get table");
     return null;
