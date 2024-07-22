@@ -53,9 +53,19 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
   if (constraintsHeader && constraintsHeader.parentElement) {
     const nextElement = constraintsHeader.parentElement.nextElementSibling;
     if (nextElement instanceof HTMLUListElement) {
-      constraints = Array.from(nextElement.querySelectorAll("li")).map(
-        (li) => (li instanceof HTMLElement ? li.textContent?.trim() : "") || ""
-      );
+      constraints = Array.from(nextElement.querySelectorAll("li")).map((li) => {
+        if (li instanceof HTMLElement) {
+          let html = li.innerHTML;
+          // <sup> 태그로 표현된 지수를 ^ 기호로 변경
+          html = html.replace(/(\d+)<sup>(\d+)<\/sup>/g, "$1^$2");
+          // HTML 엔티티를 적절한 기호로 변경
+          html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+          html = html.replace(/<\/?code>/g, ""); // code 태그 제거
+          let result = html.replace(/<[^>]*>/g, ""); // 남은 HTML 태그 제거
+          return result;
+        }
+        return "";
+      });
     }
   }
   return "  " + constraints.join("\n  ");
