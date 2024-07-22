@@ -4,7 +4,6 @@ import {
   handleBaekjoonRequest,
 } from "./utils/baekjoonUtils";
 import {
-  getLeetcodeExample,
   getLeetcodeFormat,
   getLeetcodeTitle,
   handleLeetcodeRequest,
@@ -18,7 +17,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message === BAEKJOON.COMMANDS.GET_FORMAT) {
     const baekjoonFormat = handleBaekjoonRequest(getBaekjoonFormat);
     sendResponse(baekjoonFormat);
-  } else if (message == LEETCODE.COMMANDS.GET_EXAMPLE) {
   } else if (message == LEETCODE.COMMANDS.GET_FORMAT) {
     const leetcodeFormat = handleLeetcodeRequest(getLeetcodeFormat);
     sendResponse(leetcodeFormat);

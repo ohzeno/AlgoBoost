@@ -87,7 +87,6 @@ for inputdata in inputdatas:
     difficulty: 'div[class*="text-difficulty"]',
   },
   COMMANDS: {
-    GET_EXAMPLE: "getLeetcodeExample",
     GET_FORMAT: "getLeetcodeFormat",
     GET_TITLE: "getLeetcodeTitle",
   },
