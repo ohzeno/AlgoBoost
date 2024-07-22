@@ -85,20 +85,23 @@ function getUpperPart(problemDescriptionDiv: HTMLDivElement): string {
   const curUrl = window.location.href.replace(/\/description\/$/, "/");
   const constraints = getConstraints(problemDescriptionDiv);
   const baseCode = extractEditorCode();
-  return `curUrl: ${curUrl}\n
-constraints:\n${constraints}\n
-baseCode:\n${baseCode}`;
+  return LEETCODE.TEMPLATES.UPPER.replace("{URL}", curUrl)
+    .replace("{CONSTRAINTS}", constraints)
+    .replace("{BASE_CODE}", baseCode);
 }
 
 function getExamples(problemDescriptionDiv: HTMLDivElement): string {
   const exampleDivs = problemDescriptionDiv.querySelectorAll("pre");
-  const examples: { input: string; output: string }[] = [];
+  const exampleData = parseExampleElements(exampleDivs);
+  return formatExampleData(exampleData);
+}
 
-  exampleDivs.forEach((div) => {
-    const strongElements = div.querySelectorAll("strong");
+function parseExampleElements(exampleDivs: NodeListOf<Element>): any[] {
+  const exampleData: any[] = [];
+  for (const exampleDiv of exampleDivs) {
+    const strongElements = exampleDiv.querySelectorAll("strong");
     let inputElement: Element | null = null;
     let outputElement: Element | null = null;
-
     for (const element of strongElements) {
       if (element.textContent?.includes("Input:")) {
         inputElement = element;
@@ -106,17 +109,39 @@ function getExamples(problemDescriptionDiv: HTMLDivElement): string {
         outputElement = element;
       }
     }
+    if (!(inputElement && outputElement)) continue;
+    const inputElemText = inputElement.nextSibling?.textContent?.trim() ?? "";
+    exampleData.push({
+      data: parseInput(inputElemText),
+      answer: outputElement.nextSibling?.textContent?.trim() ?? "",
+    });
+  }
+  return exampleData;
+}
 
-    if (inputElement && outputElement) {
-      const input = inputElement.nextSibling?.textContent?.trim() || "";
-      const output = outputElement.nextSibling?.textContent?.trim() || "";
+function parseInput(inputText: string): any[] {
+  /* 
+  split 사용하니 혹시나 파라미터 값에 ', '가 나오거나 ' = '가 나오면
+  문제 생길 수 있음.
+  개인 용도 플젝이고, 그런 문제는 드무니 일단은 그냥 쓰고 버그 생겼을 때 수정하자.
+  */
+  const inputArray = [];
+  const parameters = inputText.split(", ");
+  for (const parameter of parameters) {
+    const value = parameter.split(" = ")[1];
+    inputArray.push(value);
+  }
+  return inputArray;
+}
 
-      if (input && output) {
-        examples.push({ input, output });
-      }
-    }
-  });
-  return JSON.stringify(examples, null, 2);
+function formatExampleData(exampleData: any[]): string {
+  const formattedData = exampleData
+    .map(
+      ({ data, answer }) =>
+        `    {"data": [${data.join(", ")}], "answer": ${answer}}`
+    )
+    .join(",\n");
+  return `inputdatas = [\n${formattedData}\n]`;
 }
 
 function getDifficultyStr(problemDescriptionDiv: HTMLDivElement): string {
@@ -147,7 +172,7 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
     const statElements = statsDiv.querySelectorAll("div");
     statElements.forEach((el) => {
       if (el.textContent?.includes("Submissions")) {
-        submissions = el.nextElementSibling?.textContent?.trim() || "";
+        submissions = el.nextElementSibling?.textContent?.trim() ?? "";
       } else if (el.textContent?.includes("Acceptance Rate")) {
         acceptanceRate = el.nextElementSibling?.textContent?.trim() || "";
       }
@@ -160,10 +185,10 @@ function getLowerPart(problemDescriptionDiv: HTMLDivElement): string {
   const examples = getExamples(problemDescriptionDiv);
   const difficulty = getDifficultyStr(problemDescriptionDiv);
   const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
-  return `difficulty: ${difficulty}\n
-examples: ${examples}\n
-submissions: ${submissions}\n
-acceptanceRate: ${acceptanceRate}`;
+  return LEETCODE.TEMPLATES.LOWER.replace("{DIFFICULTY}", difficulty)
+    .replace("{INPUTDATAS}", examples)
+    .replace("{SUBMISSIONS}", submissions)
+    .replace("{ACCEPTANCERATE}", acceptanceRate);
 }
 
 export function getLeetcodeFormat(): string {
@@ -178,7 +203,7 @@ export function getLeetcodeFormat(): string {
   );
   const upperPart = getUpperPart(problemDescriptionDiv);
   const lowerPart = getLowerPart(problemDescriptionDiv);
-  return `${upperPart}\n\n${lowerPart}\n`;
+  return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
 export function handleLeetcodeRequest(requestFunction) {
