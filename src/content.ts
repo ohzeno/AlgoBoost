@@ -8,7 +8,7 @@ import {
   getLeetcodeTitle,
   handleLeetcodeRequest,
 } from "./utils/leetcodeUtils";
-import { BAEKJOON, LEETCODE } from "./constants";
+import { BAEKJOON, LEETCODE, PROGRAMMERS } from "./constants";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message === BAEKJOON.COMMANDS.GET_EXAMPLE) {

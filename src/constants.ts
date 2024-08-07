@@ -91,3 +91,18 @@ for inputdata in inputdatas:
     GET_TITLE: "getLeetcodeTitle",
   },
 };
+
+export const PROGRAMMERS = {
+  BASE_URL: "https://programmers.co.kr",
+  REGEX: {
+    problem_list:
+      /^https:\/\/school\.programmers\.co\.kr\/learn\/challenges(?:\/(?:beginner|training))?\?order=[^&]+(&.*)?$/,
+    specilal_problem_list:
+      /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/parts\/\d+$/,
+    problem:
+      /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
+  },
+  TEMPLATES: {},
+  SELECTORS: {},
+  COMMANDS: {},
+};
