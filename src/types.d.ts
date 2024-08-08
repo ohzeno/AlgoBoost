@@ -15,3 +15,9 @@ interface BaekjoonProblemStats {
   subCnt: string;
   accRate: string;
 }
+
+interface ProgrammersRegExpMatches {
+  problemListMatch: RegExpMatchArray | null;
+  specialProblemListMatch: RegExpMatchArray | null;
+  problemMatch: RegExpMatchArray | null;
+}

@@ -104,5 +104,8 @@ export const PROGRAMMERS = {
   },
   TEMPLATES: {},
   SELECTORS: {},
-  COMMANDS: {},
+  COMMANDS: {
+    GET_FORMAT: "getProgrammersFormat",
+    GET_TITLE: "getProgrammersTitle",
+  },
 };
