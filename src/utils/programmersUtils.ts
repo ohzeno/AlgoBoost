@@ -42,3 +42,23 @@ export async function createProgrammersSection(): Promise<void> {
     async () => await copyTextToClipboard(PROGRAMMERS.COMMANDS.GET_TITLE)
   );
 }
+
+export function getProgrammersTitle(): string {
+  const titleElement = document.querySelector<HTMLDivElement>(
+    PROGRAMMERS.SELECTORS.title
+  );
+  if (!titleElement) {
+    // showNotification("Failed to get the title");
+    return null;
+  }
+  const title = titleElement.dataset.lessonTitle;
+  return title;
+}
+
+export function handleProgrammersRequest(requestFunction) {
+  try {
+    return requestFunction();
+  } catch (error) {
+    return null;
+  }
+}

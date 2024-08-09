@@ -103,7 +103,9 @@ export const PROGRAMMERS = {
       /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
   },
   TEMPLATES: {},
-  SELECTORS: {},
+  SELECTORS: {
+    title: "div.lesson-content",
+  },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
