@@ -8,7 +8,11 @@ import {
   getLeetcodeTitle,
   handleLeetcodeRequest,
 } from "./utils/leetcodeUtils";
-import { BAEKJOON, LEETCODE } from "./constants";
+import {
+  getProgrammersTitle,
+  handleProgrammersRequest,
+} from "./utils/programmersUtils";
+import { BAEKJOON, LEETCODE, PROGRAMMERS } from "./constants";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message === BAEKJOON.COMMANDS.GET_EXAMPLE) {
@@ -23,6 +27,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message == LEETCODE.COMMANDS.GET_TITLE) {
     const leetcodeTitle = handleLeetcodeRequest(getLeetcodeTitle);
     sendResponse(leetcodeTitle);
+  } else if (message == PROGRAMMERS.COMMANDS.GET_FORMAT) {
+  } else if (message == PROGRAMMERS.COMMANDS.GET_TITLE) {
+    const programmersTitle = handleProgrammersRequest(getProgrammersTitle);
+    sendResponse(programmersTitle);
   }
   return true;
 });
