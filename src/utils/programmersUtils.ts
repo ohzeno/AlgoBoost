@@ -55,6 +55,25 @@ export function getProgrammersTitle(): string {
   return title;
 }
 
+function getUpperPart(url: string): string {
+  return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url);
+}
+
+function getLowerPart(): string {
+  return PROGRAMMERS.TEMPLATES.LOWER;
+}
+
+export function getProgrammersFormat(): string {
+  const curUrl = window.location.href;
+  if (!curUrl.match(PROGRAMMERS.REGEX.problem)) {
+    // showNotification("This is not a Programmers problem page");
+    return null;
+  }
+  const upperPart = getUpperPart(curUrl);
+  const lowerPart = getLowerPart();
+  return `${upperPart}\n\n\n${lowerPart}\n`;
+}
+
 export function handleProgrammersRequest(requestFunction) {
   try {
     return requestFunction();
