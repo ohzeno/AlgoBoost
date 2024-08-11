@@ -134,6 +134,7 @@ for inputdata in inputdatas:
   },
   SELECTORS: {
     title: "div.lesson-content",
+    editor: 'textarea#code[name="code"]',
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",

@@ -55,8 +55,24 @@ export function getProgrammersTitle(): string {
   return title;
 }
 
+function extractEditorCode(): string {
+  const hiddenTextarea = document.querySelector(
+    PROGRAMMERS.SELECTORS.editor
+  ) as HTMLTextAreaElement;
+  if (!hiddenTextarea) {
+    console.error("Hidden textarea not found");
+    return "";
+  }
+  const editorCode = hiddenTextarea.value.trim();
+  return editorCode;
+}
+
 function getUpperPart(url: string): string {
-  return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url);
+  const baseCode = extractEditorCode();
+  return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url).replace(
+    "{BASE_CODE}",
+    baseCode
+  );
 }
 
 function getLowerPart(): string {
