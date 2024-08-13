@@ -141,3 +141,9 @@ for inputdata in inputdatas:
     GET_TITLE: "getProgrammersTitle",
   },
 };
+
+export const BULLET_TYPES = {
+  disc: "•",
+  circle: "◦",
+  square: "▪",
+};
