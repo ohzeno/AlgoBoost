@@ -102,12 +102,48 @@ export const PROGRAMMERS = {
     problem:
       /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
   },
-  TEMPLATES: {},
+  TEMPLATES: {
+    UPPER: `# {URL}
+"""
+constraints:
+{CONSTRAINTS}
+"""
+
+
+{BASE_CODE}
+
+
+{INPUTDATAS}`,
+    LOWER: `"""
+{PROBLEM_TAG}
+{DIFFICULTY}. 현 시점 완료한 사람 {COMPLETE_CNT}명, 정답률 {ACCEPTANCERATE}%
+"""
+
+for inputdata in inputdatas:
+    data, ans = inputdata["data"], inputdata["answer"]
+    res = solution(*data)
+    if res == ans:
+        print("pass")
+    else:
+        summary = "fail"
+        for label, content in [("expected:", ans), ("got:", res)]:
+            summary += f"\n  {label}\n"
+            summary += f"    {content}\n"
+            summary = summary.rstrip()
+        print(summary)`,
+  },
   SELECTORS: {
     title: "div.lesson-content",
+    editor: 'textarea#code[name="code"]',
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
   },
+};
+
+export const BULLET_TYPES = {
+  disc: "•",
+  circle: "◦",
+  square: "▪",
 };

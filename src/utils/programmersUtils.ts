@@ -1,6 +1,6 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
-import { PROGRAMMERS } from "../constants";
+import { PROGRAMMERS, BULLET_TYPES } from "../constants";
 import { copyTextToClipboard } from "./clipboardUtils";
 
 function getMatches(url: string): ProgrammersRegExpMatches {
@@ -53,6 +53,105 @@ export function getProgrammersTitle(): string {
   }
   const title = titleElement.dataset.lessonTitle;
   return title;
+}
+
+function extractEditorCode(): string {
+  const hiddenTextarea = document.querySelector(
+    PROGRAMMERS.SELECTORS.editor
+  ) as HTMLTextAreaElement;
+  if (!hiddenTextarea) {
+    console.error("Hidden textarea not found");
+    return "";
+  }
+  const editorCode = hiddenTextarea.value.trim();
+  return editorCode;
+}
+
+function getBullet(depth: number, li: Element, index: number): string {
+  if (depth == 0) return BULLET_TYPES.disc;
+  const computedStyle = window.getComputedStyle(li);
+  const listStyleType = computedStyle.getPropertyValue("list-style-type");
+
+  if (listStyleType === "decimal") return `${index + 1}.`;
+  return BULLET_TYPES[listStyleType];
+}
+
+function htmlToText(element: Element): string {
+  return Array.from(element.childNodes)
+    .map((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        if (el.tagName === "CODE") {
+          return el.textContent;
+        } else if (el.tagName === "SUP") {
+          return `^${el.textContent}`;
+        } else {
+        } // 중첩목록이면 여기서 처리하지 않음
+      }
+      return "";
+    })
+    .join("");
+}
+
+function processListItems(ul: Element, depth: number = 0): string[] {
+  return Array.from(ul.children).flatMap((li, index) => {
+    const bullet = getBullet(depth, li, index);
+    const indent = "  ".repeat(depth + 1);
+
+    let text = htmlToText(li)
+      .replace(/\s+/g, " ")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&le;/g, "≤")
+      .replace(/&ge;/g, "≥")
+      .trim();
+
+    let result = [`${indent}${bullet} ${text}`];
+
+    const nestedUl = li.querySelector(":scope > ul, :scope > ol");
+    if (nestedUl) {
+      result.push(...processListItems(nestedUl, depth + 1));
+    }
+    return result;
+  });
+}
+
+function getConstraints(): string {
+  const constraintsSection = Array.from(document.querySelectorAll("h5")).find(
+    (el) => el.textContent.includes("제한사항")
+  );
+  if (!constraintsSection) {
+    // showNotification("Failed to get the constraints");
+    return "";
+  }
+  const ulElem = constraintsSection.nextElementSibling as Element;
+  const constraints = processListItems(ulElem);
+  return constraints.join("\n");
+}
+
+function getUpperPart(url: string): string {
+  const baseCode = extractEditorCode();
+  const constraints = getConstraints();
+  return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url)
+    .replace("{BASE_CODE}", baseCode)
+    .replace("{CONSTRAINTS}", constraints);
+}
+
+function getLowerPart(): string {
+  return PROGRAMMERS.TEMPLATES.LOWER;
+}
+
+export function getProgrammersFormat(): string {
+  const curUrl = window.location.href;
+  if (!curUrl.match(PROGRAMMERS.REGEX.problem)) {
+    // showNotification("This is not a Programmers problem page");
+    return null;
+  }
+  const upperPart = getUpperPart(curUrl);
+  const lowerPart = getLowerPart();
+  return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
 export function handleProgrammersRequest(requestFunction) {

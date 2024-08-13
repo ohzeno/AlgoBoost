@@ -10,6 +10,7 @@ import {
 } from "./utils/leetcodeUtils";
 import {
   getProgrammersTitle,
+  getProgrammersFormat,
   handleProgrammersRequest,
 } from "./utils/programmersUtils";
 import { BAEKJOON, LEETCODE, PROGRAMMERS } from "./constants";
@@ -28,6 +29,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const leetcodeTitle = handleLeetcodeRequest(getLeetcodeTitle);
     sendResponse(leetcodeTitle);
   } else if (message == PROGRAMMERS.COMMANDS.GET_FORMAT) {
+    const programmersFormat = handleProgrammersRequest(getProgrammersFormat);
+    sendResponse(programmersFormat);
   } else if (message == PROGRAMMERS.COMMANDS.GET_TITLE) {
     const programmersTitle = handleProgrammersRequest(getProgrammersTitle);
     sendResponse(programmersTitle);
