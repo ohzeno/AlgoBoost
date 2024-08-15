@@ -131,12 +131,53 @@ function getConstraints(): string {
   return constraints.join("\n");
 }
 
+function parseExampleElements(tableElem: HTMLTableElement): any[] {
+  const rows = Array.from(tableElem.querySelectorAll("tbody tr"));
+  const exampleData: any[] = [];
+  for (const row of rows) {
+    const cells = Array.from(row.querySelectorAll("td"));
+    const data = cells.slice(0, -1).map((cell) => {
+      let content = cell.textContent.trim();
+      content = content.replace(/<\/?code>/g, "");
+      return content;
+    });
+    const answer = cells[cells.length - 1].textContent.trim();
+    exampleData.push({ data, answer });
+  }
+  return exampleData;
+}
+
+function formatExampleData(exampleData: any[]): string {
+  const formattedData = exampleData
+    .map(
+      ({ data, answer }) =>
+        `    {"data": [${data.join(", ")}], "answer": ${answer}}`
+    )
+    .join(",\n");
+  return `inputdatas = [\n${formattedData}\n]`;
+}
+
+function getExamples(): string {
+  const examplesSection = Array.from(document.querySelectorAll("h5")).find(
+    (el) => el.textContent === "입출력 예"
+  );
+  if (!examplesSection) {
+    // showNotification("Failed to get the examples");
+    return "";
+  }
+  const tableElem = examplesSection.nextElementSibling as HTMLTableElement;
+  const exampleData = parseExampleElements(tableElem);
+  return formatExampleData(exampleData);
+}
+
 function getUpperPart(url: string): string {
   const baseCode = extractEditorCode();
   const constraints = getConstraints();
+  const examples = getExamples();
   return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url)
     .replace("{BASE_CODE}", baseCode)
-    .replace("{CONSTRAINTS}", constraints);
+    .replace("{CONSTRAINTS}", constraints)
+    .replace("{INPUTDATAS}", examples);
 }
 
 function getLowerPart(): string {
