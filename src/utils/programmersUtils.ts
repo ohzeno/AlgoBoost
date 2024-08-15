@@ -180,10 +180,42 @@ function getUpperPart(url: string): string {
     .replace("{INPUTDATAS}", examples);
 }
 
+function customUrlEncode(str: string): string {
+  return str
+    .split("")
+    .map((char) => {
+      if (char.match(/[a-zA-Z0-9]/)) {
+        // 영문자와 숫자는 그대로 유지
+        return char;
+      } else if (char === " ") {
+        // 공백은 '+'로 변환
+        return "+";
+      } else {
+        // 나머지 문자 (한글 포함)
+        return encodeURIComponent(char)
+          .split("%")
+          .filter(Boolean)
+          .map((hex) => `%${hex.toUpperCase()}`)
+          .join("");
+      }
+    })
+    .join("");
+}
+
 function getLowerPart(): string {
   const problemTag = document.querySelector<HTMLDivElement>(
     PROGRAMMERS.SELECTORS.problemTag
   ).textContent;
+  const title = getProgrammersTitle();
+  const searchUrl = PROGRAMMERS.URLS.SEARCH.replace(
+    "{PARAM}",
+    customUrlEncode(title)
+  );
+  // 기존 탭 중에 해당 주소 창이 있는지 확인
+  // 없으면 현재 탭 왼쪽에 새 탭 열기
+  // 새 탭 열리고 잠시 후 주소 바뀌었는지 확인
+  // 주소 바뀌었으면 옆 탭에서 초기화 버튼 누르기
+  // 검색 창에서 문제 정보 가져오기
   return PROGRAMMERS.TEMPLATES.LOWER.replace("{PROBLEM_TAG}", problemTag);
 }
 
