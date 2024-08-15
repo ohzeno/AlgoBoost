@@ -113,7 +113,7 @@ async function handleBaekjoonTab(type: baekjoonTabType) {
 function getNewUrl(tabType: string, problemNumber: string): string {
   const typeStr =
     tabType === BAEKJOON.TAB_TYPES.SOLVED_USERS ? "problem" : "short";
-  return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
+  return `${BAEKJOON.URLS.BASE}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
 }
 
 export function getBaekjoonExample(): string {

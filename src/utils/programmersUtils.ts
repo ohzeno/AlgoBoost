@@ -181,7 +181,10 @@ function getUpperPart(url: string): string {
 }
 
 function getLowerPart(): string {
-  return PROGRAMMERS.TEMPLATES.LOWER;
+  const problemTag = document.querySelector<HTMLDivElement>(
+    PROGRAMMERS.SELECTORS.problemTag
+  ).textContent;
+  return PROGRAMMERS.TEMPLATES.LOWER.replace("{PROBLEM_TAG}", problemTag);
 }
 
 export function getProgrammersFormat(): string {

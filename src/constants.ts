@@ -1,5 +1,7 @@
 export const BAEKJOON = {
-  BASE_URL: "https://www.acmicpc.net",
+  URLS: {
+    BASE: "https://www.acmicpc.net",
+  },
   REGEX: {
     problem: /^https:\/\/www\.acmicpc\.net\/problem\/(\d+)$/,
     solver:
@@ -41,7 +43,9 @@ def input():
 };
 
 export const LEETCODE = {
-  BASE_URL: "https://leetcode.com",
+  URLS: {
+    BASE: "https://leetcode.com",
+  },
   REGEX: {
     problem: /^https:\/\/leetcode\.com\/problems\/.+/,
   },
@@ -93,7 +97,11 @@ for inputdata in inputdatas:
 };
 
 export const PROGRAMMERS = {
-  BASE_URL: "https://programmers.co.kr",
+  URLS: {
+    BASE: "https://programmers.co.kr",
+    SEARCH:
+      "https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search={PARAM}",
+  },
   REGEX: {
     problem_list:
       /^https:\/\/school\.programmers\.co\.kr\/learn\/challenges(?:\/(?:beginner|training))?\?order=[^&]+(&.*)?$/,
@@ -135,6 +143,7 @@ for inputdata in inputdatas:
   SELECTORS: {
     title: "div.lesson-content",
     editor: 'textarea#code[name="code"]',
+    problemTag: "ol.breadcrumb > li:nth-child(2) > a",
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
