@@ -243,6 +243,13 @@ export async function getProgrammersFormat(): Promise<string> {
   return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
+export function searchReset(): void {
+  const resetBtn = document.querySelector<HTMLButtonElement>(
+    PROGRAMMERS.SELECTORS.resetBtn
+  );
+  resetBtn.click();
+}
+
 export function handleProgrammersRequest(requestFunction) {
   try {
     return requestFunction();

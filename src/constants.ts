@@ -144,11 +144,13 @@ for inputdata in inputdatas:
     title: "div.lesson-content",
     editor: 'textarea#code[name="code"]',
     problemTag: "ol.breadcrumb > li:nth-child(2) > a",
+    resetBtn: "button.init-button",
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
     GET_PROBLEM_INFO: "getProgrammersProblemInfo",
+    SEARCH_RESET: "programmersSearchReset",
   },
 };
 

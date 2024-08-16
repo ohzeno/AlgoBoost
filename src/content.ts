@@ -11,6 +11,7 @@ import {
 import {
   getProgrammersTitle,
   getProgrammersFormat,
+  searchReset,
   handleProgrammersRequest,
 } from "./utils/programmersUtils";
 import { BAEKJOON, LEETCODE, PROGRAMMERS, GLOBAL_CONSTANTS } from "./constants";
@@ -27,14 +28,20 @@ const commandHandlers = {
     handleProgrammersRequest(getProgrammersFormat),
   [PROGRAMMERS.COMMANDS.GET_TITLE]: () =>
     handleProgrammersRequest(getProgrammersTitle),
+  [PROGRAMMERS.COMMANDS.SEARCH_RESET]: () =>
+    handleProgrammersRequest(searchReset),
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action !== GLOBAL_CONSTANTS.COMMANDS.COPY) return;
-  const command = message.data.getTextFunctionName;
-  const handler = commandHandlers[command];
-  if (!handler) return;
-  const response = handler();
-  sendResponse(response);
+  if (message.action === GLOBAL_CONSTANTS.COMMANDS.COPY) {
+    const command = message.data.getTextFunctionName;
+    const handler = commandHandlers[command];
+    if (!handler) return;
+    const response = handler();
+    sendResponse(response);
+  } else if (message.action === PROGRAMMERS.COMMANDS.SEARCH_RESET) {
+    const handler = commandHandlers[message.action];
+    handler();
+  }
   return true;
 });
