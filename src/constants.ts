@@ -148,11 +148,17 @@ for inputdata in inputdatas:
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
+    GET_PROBLEM_INFO: "getProgrammersProblemInfo",
   },
 };
 
-export const BULLET_TYPES = {
-  disc: "•",
-  circle: "◦",
-  square: "▪",
+export const GLOBAL_CONSTANTS = {
+  BULLET_TYPES: {
+    disc: "•",
+    circle: "◦",
+    square: "▪",
+  },
+  COMMANDS: {
+    COPY: "copy",
+  },
 };

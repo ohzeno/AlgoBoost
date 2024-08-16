@@ -1,9 +1,13 @@
 import { sendMessageToTab } from "./messageUtils";
+import { GLOBAL_CONSTANTS } from "../constants";
 
 export async function copyTextToClipboard(
   getTextFunctionName: string
 ): Promise<void> {
-  const text = await sendMessageToTab(getTextFunctionName);
+  const text = await sendMessageToTab({
+    action: GLOBAL_CONSTANTS.COMMANDS.COPY,
+    data: { getTextFunctionName },
+  });
 
   if (!text) {
     // showNotification(`Failed to get ${ordType}`);

@@ -13,27 +13,28 @@ import {
   getProgrammersFormat,
   handleProgrammersRequest,
 } from "./utils/programmersUtils";
-import { BAEKJOON, LEETCODE, PROGRAMMERS } from "./constants";
+import { BAEKJOON, LEETCODE, PROGRAMMERS, GLOBAL_CONSTANTS } from "./constants";
+
+const commandHandlers = {
+  [BAEKJOON.COMMANDS.GET_EXAMPLE]: () =>
+    handleBaekjoonRequest(getBaekjoonExample),
+  [BAEKJOON.COMMANDS.GET_FORMAT]: () =>
+    handleBaekjoonRequest(getBaekjoonFormat),
+  [LEETCODE.COMMANDS.GET_FORMAT]: () =>
+    handleLeetcodeRequest(getLeetcodeFormat),
+  [LEETCODE.COMMANDS.GET_TITLE]: () => handleLeetcodeRequest(getLeetcodeTitle),
+  [PROGRAMMERS.COMMANDS.GET_FORMAT]: () =>
+    handleProgrammersRequest(getProgrammersFormat),
+  [PROGRAMMERS.COMMANDS.GET_TITLE]: () =>
+    handleProgrammersRequest(getProgrammersTitle),
+};
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message === BAEKJOON.COMMANDS.GET_EXAMPLE) {
-    const baekjoonExample = handleBaekjoonRequest(getBaekjoonExample);
-    sendResponse(baekjoonExample);
-  } else if (message === BAEKJOON.COMMANDS.GET_FORMAT) {
-    const baekjoonFormat = handleBaekjoonRequest(getBaekjoonFormat);
-    sendResponse(baekjoonFormat);
-  } else if (message == LEETCODE.COMMANDS.GET_FORMAT) {
-    const leetcodeFormat = handleLeetcodeRequest(getLeetcodeFormat);
-    sendResponse(leetcodeFormat);
-  } else if (message == LEETCODE.COMMANDS.GET_TITLE) {
-    const leetcodeTitle = handleLeetcodeRequest(getLeetcodeTitle);
-    sendResponse(leetcodeTitle);
-  } else if (message == PROGRAMMERS.COMMANDS.GET_FORMAT) {
-    const programmersFormat = handleProgrammersRequest(getProgrammersFormat);
-    sendResponse(programmersFormat);
-  } else if (message == PROGRAMMERS.COMMANDS.GET_TITLE) {
-    const programmersTitle = handleProgrammersRequest(getProgrammersTitle);
-    sendResponse(programmersTitle);
-  }
+  if (message.action !== GLOBAL_CONSTANTS.COMMANDS.COPY) return;
+  const command = message.data.getTextFunctionName;
+  const handler = commandHandlers[command];
+  if (!handler) return;
+  const response = handler();
+  sendResponse(response);
   return true;
 });

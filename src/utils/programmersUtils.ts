@@ -1,7 +1,8 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
-import { PROGRAMMERS, BULLET_TYPES } from "../constants";
+import { PROGRAMMERS, GLOBAL_CONSTANTS } from "../constants";
 import { copyTextToClipboard } from "./clipboardUtils";
+import { sendMessagePromise } from "./messageUtils";
 
 function getMatches(url: string): ProgrammersRegExpMatches {
   return {
@@ -68,12 +69,12 @@ function extractEditorCode(): string {
 }
 
 function getBullet(depth: number, li: Element, index: number): string {
-  if (depth == 0) return BULLET_TYPES.disc;
+  if (depth == 0) return GLOBAL_CONSTANTS.BULLET_TYPES.disc;
   const computedStyle = window.getComputedStyle(li);
   const listStyleType = computedStyle.getPropertyValue("list-style-type");
 
   if (listStyleType === "decimal") return `${index + 1}.`;
-  return BULLET_TYPES[listStyleType];
+  return GLOBAL_CONSTANTS.BULLET_TYPES[listStyleType];
 }
 
 function htmlToText(element: Element): string {
@@ -202,7 +203,7 @@ function customUrlEncode(str: string): string {
     .join("");
 }
 
-function getLowerPart(): string {
+async function getLowerPart(): Promise<string> {
   const problemTag = document.querySelector<HTMLDivElement>(
     PROGRAMMERS.SELECTORS.problemTag
   ).textContent;
@@ -211,22 +212,34 @@ function getLowerPart(): string {
     "{PARAM}",
     customUrlEncode(title)
   );
-  // 기존 탭 중에 해당 주소 창이 있는지 확인
-  // 없으면 현재 탭 왼쪽에 새 탭 열기
-  // 새 탭 열리고 잠시 후 주소 바뀌었는지 확인
-  // 주소 바뀌었으면 옆 탭에서 초기화 버튼 누르기
-  // 검색 창에서 문제 정보 가져오기
+  const info = await sendMessagePromise({
+    action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO,
+    data: { searchUrl },
+  });
+  console.log("info", info);
+  /*   
+  백그라운드로 메시지 보내기
+    기존 탭 중에 해당 주소 창이 있는지 확인
+    없으면 현재 탭 왼쪽에 새 탭 열기(
+    chrome.tabs.create({url: "https://www.example.com"}, function(tab) { 
+      const createdTabId = tab.id;
+      ... 
+    }))
+    새 탭 열리고 잠시 후 주소 바뀌었는지 확인(chrome.tabs.onUpdated.addListener)
+  주소 바뀌었으면 옆 탭에서 초기화 버튼 누르기(sendMessage로 그 탭 콘텐트 스크립트)
+  검색 창에서 문제 정보 가져오기(백그라운드에서 다시 받아서 최초 실행 콘텐트로)
+  */
   return PROGRAMMERS.TEMPLATES.LOWER.replace("{PROBLEM_TAG}", problemTag);
 }
 
-export function getProgrammersFormat(): string {
+export async function getProgrammersFormat(): Promise<string> {
   const curUrl = window.location.href;
   if (!curUrl.match(PROGRAMMERS.REGEX.problem)) {
     // showNotification("This is not a Programmers problem page");
     return null;
   }
   const upperPart = getUpperPart(curUrl);
-  const lowerPart = getLowerPart();
+  const lowerPart = await getLowerPart();
   return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
