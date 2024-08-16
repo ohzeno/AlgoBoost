@@ -23,3 +23,14 @@ export async function getPageUrl(): Promise<string> {
   const activeTab = await getActiveTab();
   return activeTab.url;
 }
+
+export async function getProgrammersSearchUrlTab(
+  searchUrl: string
+): Promise<chrome.tabs.Tab | null> {
+  return new Promise((resolve) => {
+    chrome.tabs.query({}, (tabs) => {
+      const targetTab = tabs.find((tab) => tab.url?.includes(searchUrl));
+      resolve(targetTab || null);
+    });
+  });
+}
