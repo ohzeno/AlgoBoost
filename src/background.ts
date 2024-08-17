@@ -1,5 +1,6 @@
 import { PROGRAMMERS, GLOBAL_CONSTANTS } from "./constants";
 import { getProgrammersSearchUrlTab } from "./utils/tabUtils";
+import { sendMessageToTabPromise } from "./utils/messageUtils";
 
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.recipient !== GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND) return;
@@ -13,11 +14,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         searchUrlTab = tab;
       });
     }
-    chrome.tabs.sendMessage(searchUrlTab.id, {
+    const response = await sendMessageToTabPromise(searchUrlTab.id, {
       action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB,
       recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
     });
-    sendResponse({ Hi: "Hi2" });
+    sendResponse(response);
   }
   return true;
 });

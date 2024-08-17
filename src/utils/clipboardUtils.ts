@@ -1,10 +1,10 @@
-import { sendMessageToTab } from "./messageUtils";
+import { sendMessageToActiveTab } from "./messageUtils";
 import { GLOBAL_CONSTANTS } from "../constants";
 
 export async function copyTextToClipboard(
   getTextFunctionName: string
 ): Promise<void> {
-  const text = await sendMessageToTab({
+  const text = await sendMessageToActiveTab({
     action: GLOBAL_CONSTANTS.COMMANDS.COPY,
     data: { getTextFunctionName },
     recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
