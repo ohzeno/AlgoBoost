@@ -149,7 +149,8 @@ for inputdata in inputdatas:
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
-    GET_PROBLEM_INFO: "getProgrammersProblemInfo",
+    GET_PROBLEM_INFO_REQUEST: "getProgrammersProblemInfoRequest",
+    GET_PROBLEM_INFO_FROM_TAB: "getProgrammersProblemInfoFromTab",
     SEARCH_RESET: "programmersSearchReset",
   },
 };
@@ -162,5 +163,9 @@ export const GLOBAL_CONSTANTS = {
   },
   COMMANDS: {
     COPY: "copy",
+  },
+  RECIPIENTS: {
+    BACKGROUND: "background",
+    CONTENT: "content",
   },
 };

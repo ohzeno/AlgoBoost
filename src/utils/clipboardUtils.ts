@@ -7,6 +7,7 @@ export async function copyTextToClipboard(
   const text = await sendMessageToTab({
     action: GLOBAL_CONSTANTS.COMMANDS.COPY,
     data: { getTextFunctionName },
+    recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
   });
 
   if (!text) {

@@ -213,8 +213,9 @@ async function getLowerPart(): Promise<string> {
     customUrlEncode(title)
   );
   const info = await sendMessagePromise({
-    action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO,
+    action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
     data: { searchUrl },
+    recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
   });
   console.log("info", info);
   /*   
@@ -243,12 +244,16 @@ export async function getProgrammersFormat(): Promise<string> {
   return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
-export function searchReset(): void {
+function searchReset(): void {
   const resetBtn = document.querySelector<HTMLButtonElement>(
     PROGRAMMERS.SELECTORS.resetBtn
   );
-  resetBtn.click();
+  if (resetBtn) resetBtn.click();
 }
+
+export async function getProgrammersProblemInfo(
+  searchUrl: string
+): Promise<void> {}
 
 export function handleProgrammersRequest(requestFunction) {
   try {

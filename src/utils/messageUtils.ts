@@ -1,7 +1,12 @@
 import { getActiveTab } from "./tabUtils";
+import { GLOBAL_CONSTANTS } from "../constants";
 
 export function sendMessageToBackground(action, data = {}) {
-  chrome.runtime.sendMessage({ action, data });
+  chrome.runtime.sendMessage({
+    action,
+    data,
+    recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
+  });
 }
 
 export async function sendMessageToTab(message: any): Promise<any> {
