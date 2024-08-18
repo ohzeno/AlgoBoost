@@ -2,7 +2,10 @@ import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
 import { PROGRAMMERS, GLOBAL_CONSTANTS } from "../constants";
 import { copyTextToClipboard } from "./clipboardUtils";
-import { sendMessagePromise } from "./messageUtils";
+import {
+  sendMessagePromise,
+  sendMessageToBackgroundWithPort,
+} from "./messageUtils";
 
 function getMatches(url: string): ProgrammersRegExpMatches {
   return {
@@ -212,7 +215,7 @@ async function getLowerPart(): Promise<string> {
     "{PARAM}",
     customUrlEncode(title)
   );
-  const info = await sendMessagePromise({
+  const info = await sendMessageToBackgroundWithPort({
     action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
     data: { searchUrl },
     recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
@@ -253,7 +256,10 @@ function searchReset(): void {
 
 export async function getProgrammersProblemInfo(
   searchUrl: string
-): Promise<void> {}
+): Promise<string> {
+  console.log("ㅎㅇ");
+  return "test";
+}
 
 export function handleProgrammersRequest(requestFunction) {
   try {

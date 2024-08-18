@@ -18,6 +18,7 @@ export function sendMessageToTabPromise(
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
       } else {
+        console.log("sendMessageToTabPromise response", response);
         resolve(response);
       }
     });
@@ -39,5 +40,24 @@ export function sendMessagePromise(message) {
         resolve(response);
       }
     });
+  });
+}
+
+export function sendMessageToBackgroundWithPort(message: any): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const port = chrome.runtime.connect({ name: "problem-info" });
+
+    const listener = (response: any) => {
+      if (response.error) {
+        reject(new Error(response.error));
+      } else {
+        resolve(response);
+      }
+      port.onMessage.removeListener(listener);
+      port.disconnect();
+    };
+
+    port.onMessage.addListener(listener);
+    port.postMessage(message);
   });
 }

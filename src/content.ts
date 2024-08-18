@@ -32,7 +32,7 @@ const commandHandlers = {
     handleProgrammersRequest(getProgrammersProblemInfo),
 };
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.recipient !== GLOBAL_CONSTANTS.RECIPIENTS.CONTENT) return;
   let command;
   if (message.action === GLOBAL_CONSTANTS.COMMANDS.COPY) {
@@ -44,7 +44,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   const handler = commandHandlers[command];
   if (!handler) return;
-  const response = handler();
+  const response = await handler();
+  console.log("content before response", response);
   sendResponse(response);
   return true;
 });
