@@ -21,8 +21,15 @@ chrome.runtime.onConnect.addListener(function (port) {
             chrome.tabs.create(
               { url: searchUrl, index: port.sender.tab.index, active: false },
               (tab) => {
-                console.log(`after create tab ${new Date().toISOString()}`);
-                resolve(tab);
+                chrome.tabs.onUpdated.addListener(function listener(
+                  tabId,
+                  info
+                ) {
+                  if (tabId === tab.id && info.status === "complete") {
+                    chrome.tabs.onUpdated.removeListener(listener);
+                    resolve(tab);
+                  }
+                });
               }
             );
           });
