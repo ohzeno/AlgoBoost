@@ -1,3 +1,31 @@
+export const GLOBAL_CONSTANTS = {
+  BULLET_TYPES: {
+    disc: "•",
+    circle: "◦",
+    square: "▪",
+  },
+  COMMANDS: {
+    COPY: "copy",
+  },
+  RECIPIENTS: {
+    BACKGROUND: "background",
+    CONTENT: "content",
+  },
+  TEMPLATE_VAR: {
+    URL: "{URL}",
+    BASE_CODE: "{BASE_CODE}",
+    CONSTRAINTS: "{CONSTRAINTS}",
+    INPUTDATAS: "{INPUTDATAS}",
+    PROBLEM_TAG: "{PROBLEM_TAG}",
+    DIFFICULTY: "{DIFFICULTY}",
+    SUBMISSIONS: "{SUBMISSIONS}",
+    ACCEPTANCE_RATE: "{ACCEPTANCE_RATE}",
+    TIER: "{TIER}",
+    FINISHED_CNT: "{FINISHED_CNT}",
+    PARAMETER: "{PARAMETER}",
+  },
+};
+
 export const BAEKJOON = {
   URLS: {
     BASE: "https://www.acmicpc.net",
@@ -16,7 +44,7 @@ export const BAEKJOON = {
   TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
   RANKS: ["V", "IV", "III", "II", "I"],
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 import sys
 # sys.stdin = open('input.txt')
 def input():
@@ -24,7 +52,7 @@ def input():
 """
 """`,
     LOWER: `"""
-현 시점 {TIER}. 제출 {SUBCNT}. 정답률 {ACCRATE} %
+현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
 """`,
   },
   SELECTORS: {
@@ -50,21 +78,21 @@ export const LEETCODE = {
     problem: /^https:\/\/leetcode\.com\/problems\/.+/,
   },
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 from typing import Optional, List
 
 """
 constraints:
-{CONSTRAINTS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 """
 
 
-{BASE_CODE}`,
-    LOWER: `{INPUTDATAS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}`,
+    LOWER: `${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
 
 """
-LeetCode {DIFFICULTY}.
-제출 {SUBMISSIONS}, 정답률 {ACCEPTANCERATE}%
+LeetCode ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}.
+제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
 
 """
 import inspect
@@ -99,8 +127,7 @@ for inputdata in inputdatas:
 export const PROGRAMMERS = {
   URLS: {
     BASE: "https://programmers.co.kr",
-    SEARCH:
-      "https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search={PARAM}",
+    SEARCH: `https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search=${GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER}`,
   },
   REGEX: {
     problem_list:
@@ -111,20 +138,20 @@ export const PROGRAMMERS = {
       /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
   },
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 """
 constraints:
-{CONSTRAINTS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 """
 
 
-{BASE_CODE}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
 
 
-{INPUTDATAS}`,
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}`,
     LOWER: `"""
-{PROBLEM_TAG}
-{DIFFICULTY}. 현 시점 완료한 사람 {COMPLETE_CNT}명, 정답률 {ACCEPTANCERATE}%
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}명, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}%
 """
 
 for inputdata in inputdatas:
@@ -145,6 +172,7 @@ for inputdata in inputdatas:
     editor: 'textarea#code[name="code"]',
     problemTag: "ol.breadcrumb > li:nth-child(2) > a",
     resetBtn: "button.init-button",
+    tableRow: "table tbody tr",
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
@@ -152,20 +180,5 @@ for inputdata in inputdatas:
     GET_PROBLEM_INFO_REQUEST: "getProgrammersProblemInfoRequest",
     GET_PROBLEM_INFO_FROM_TAB: "getProgrammersProblemInfoFromTab",
     SEARCH_RESET: "programmersSearchReset",
-  },
-};
-
-export const GLOBAL_CONSTANTS = {
-  BULLET_TYPES: {
-    disc: "•",
-    circle: "◦",
-    square: "▪",
-  },
-  COMMANDS: {
-    COPY: "copy",
-  },
-  RECIPIENTS: {
-    BACKGROUND: "background",
-    CONTENT: "content",
   },
 };

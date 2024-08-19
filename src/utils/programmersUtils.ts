@@ -178,10 +178,13 @@ function getUpperPart(url: string): string {
   const baseCode = extractEditorCode();
   const constraints = getConstraints();
   const examples = getExamples();
-  return PROGRAMMERS.TEMPLATES.UPPER.replace("{URL}", url)
-    .replace("{BASE_CODE}", baseCode)
-    .replace("{CONSTRAINTS}", constraints)
-    .replace("{INPUTDATAS}", examples);
+  return PROGRAMMERS.TEMPLATES.UPPER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
+    url
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE, baseCode)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS, constraints)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS, examples);
 }
 
 function customUrlEncode(str: string): string {
@@ -212,7 +215,7 @@ async function getLowerPart(): Promise<string> {
   ).textContent;
   const title = getProgrammersTitle();
   const searchUrl = PROGRAMMERS.URLS.SEARCH.replace(
-    "{PARAM}",
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER,
     customUrlEncode(title)
   );
   const info = await sendMessageToBackgroundWithPort({
@@ -233,7 +236,10 @@ async function getLowerPart(): Promise<string> {
   주소 바뀌었으면 옆 탭에서 초기화 버튼 누르기(sendMessage로 그 탭 콘텐트 스크립트)
   검색 창에서 문제 정보 가져오기(백그라운드에서 다시 받아서 최초 실행 콘텐트로)
   */
-  return PROGRAMMERS.TEMPLATES.LOWER.replace("{PROBLEM_TAG}", problemTag);
+  return PROGRAMMERS.TEMPLATES.LOWER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG,
+    problemTag
+  );
 }
 
 export async function getProgrammersFormat(): Promise<string> {
@@ -247,17 +253,30 @@ export async function getProgrammersFormat(): Promise<string> {
   return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
-function searchReset(): void {
+async function searchReset(): Promise<void> {
   const resetBtn = document.querySelector<HTMLButtonElement>(
     PROGRAMMERS.SELECTORS.resetBtn
   );
-  if (resetBtn) resetBtn.click();
+  if (resetBtn) {
+    resetBtn.click();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 }
 
 export async function getProgrammersProblemInfo(
   searchUrl: string
 ): Promise<string> {
   console.log("ㅎㅇ");
+  searchReset();
+  let tableRow = document.querySelector(PROGRAMMERS.SELECTORS.tableRow);
+  if (!tableRow) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    tableRow = document.querySelector(PROGRAMMERS.SELECTORS.tableRow);
+  }
+  const level = tableRow.querySelector(".level span").textContent;
+  const finCnt = tableRow.querySelector(".finished-count").textContent;
+  const accRate = tableRow.querySelector(".acceptance-rate").textContent;
+  console.log(`level: ${level}, finishCnt: ${finCnt}, accCnt: ${accRate}`);
   return "test";
 }
 

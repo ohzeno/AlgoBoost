@@ -1,6 +1,6 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
-import { LEETCODE } from "../constants";
+import { GLOBAL_CONSTANTS, LEETCODE } from "../constants";
 import { copyTextToClipboard } from "./clipboardUtils";
 
 async function validatePage(): Promise<boolean> {
@@ -95,9 +95,12 @@ function getUpperPart(problemDescriptionDiv: HTMLDivElement): string {
   const curUrl = window.location.href.replace(/\/description\/$/, "/");
   const constraints = getConstraints(problemDescriptionDiv);
   const baseCode = extractEditorCode();
-  return LEETCODE.TEMPLATES.UPPER.replace("{URL}", curUrl)
-    .replace("{CONSTRAINTS}", constraints)
-    .replace("{BASE_CODE}", baseCode);
+  return LEETCODE.TEMPLATES.UPPER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
+    curUrl
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS, constraints)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE, baseCode);
 }
 
 function getExamples(problemDescriptionDiv: HTMLDivElement): string {
@@ -195,10 +198,13 @@ function getLowerPart(problemDescriptionDiv: HTMLDivElement): string {
   const examples = getExamples(problemDescriptionDiv);
   const difficulty = getDifficultyStr(problemDescriptionDiv);
   const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
-  return LEETCODE.TEMPLATES.LOWER.replace("{DIFFICULTY}", difficulty)
-    .replace("{INPUTDATAS}", examples)
-    .replace("{SUBMISSIONS}", submissions)
-    .replace("{ACCEPTANCERATE}", acceptanceRate);
+  return LEETCODE.TEMPLATES.LOWER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY,
+    difficulty
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS, examples)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, submissions)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, acceptanceRate);
 }
 
 export function getLeetcodeFormat(): string {

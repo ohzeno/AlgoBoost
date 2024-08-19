@@ -1,6 +1,6 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
-import { BAEKJOON } from "../constants";
+import { GLOBAL_CONSTANTS, BAEKJOON } from "../constants";
 import { divMod } from "./mathUtils";
 import { copyTextToClipboard } from "./clipboardUtils";
 
@@ -165,15 +165,21 @@ function getUpperPart(): string {
     대신 window.location.href를 사용하여 현재 url을 가져옴.
   */
   const curUrl = window.location.href;
-  return BAEKJOON.TEMPLATES.UPPER.replace("{URL}", curUrl);
+  return BAEKJOON.TEMPLATES.UPPER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
+    curUrl
+  );
 }
 
 function getLowerPart(): string {
   const tierStr = getTierStr();
   const { subCnt, accRate } = getStat();
-  return BAEKJOON.TEMPLATES.LOWER.replace("{TIER}", tierStr)
-    .replace("{SUBCNT}", subCnt)
-    .replace("{ACCRATE}", accRate);
+  return BAEKJOON.TEMPLATES.LOWER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER,
+    tierStr
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, subCnt)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, accRate);
 }
 
 function getTierStr(): string {
