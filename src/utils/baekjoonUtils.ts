@@ -204,13 +204,25 @@ function getTierStr(): string {
 }
 
 function getStat(): BaekjoonProblemStats {
-  const tdElems = document.querySelectorAll(BAEKJOON.SELECTORS.tdElems);
-  if (!tdElems || tdElems.length < 6) {
-    // showNotification("Failed to get table");
+  const table = document.querySelector<HTMLTableElement>(
+    BAEKJOON.SELECTORS.problemInfoTable
+  );
+  if (!table) {
+    // showNotification("Failed to get problem info table");
     return null;
   }
-  const subCnt = tdElems[3].textContent.trim();
-  const accRate = tdElems[5].textContent.trim().slice(0, -1);
+  const headers = Array.from(table.querySelectorAll("th"));
+  const subIdx = headers.findIndex((th) => th.textContent.trim() === "제출");
+  const accIdx = headers.findIndex(
+    (th) => th.textContent.trim() === "정답 비율"
+  );
+  if (subIdx === -1 || accIdx === -1) {
+    console.error("Required columns not found in the table");
+    return null;
+  }
+  const cells = Array.from(table.querySelectorAll("td"));
+  const subCnt = cells[subIdx].textContent.trim();
+  const accRate = cells[accIdx].textContent.trim().slice(0, -1); // Remove the '%' sign
   return { subCnt: subCnt, accRate: accRate };
 }
 

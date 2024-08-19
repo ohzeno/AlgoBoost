@@ -58,7 +58,7 @@ def input():
   SELECTORS: {
     exampleElems: ".sampledata",
     tier: "img.solvedac-tier",
-    tdElems: "#problem-info > tbody > tr > td",
+    problemInfoTable: "#problem-info",
   },
   COMMANDS: {
     GET_EXAMPLE: "getBaekjoonExample",
