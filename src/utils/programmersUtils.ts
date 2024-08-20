@@ -1,7 +1,10 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
 import { PROGRAMMERS, GLOBAL_CONSTANTS } from "../constants";
-import { copyTextToClipboard } from "./clipboardUtils";
+import {
+  copyTextToClipboard,
+  copyTextToClipboardWithPort,
+} from "./clipboardUtils";
 import { sendMessageWithPort } from "./messageUtils";
 import { waitForElement } from "./domUtils";
 
@@ -36,7 +39,8 @@ export async function createProgrammersSection(): Promise<void> {
   createFeatureBtn(
     section,
     "양식 복사",
-    async () => await copyTextToClipboard(PROGRAMMERS.COMMANDS.GET_FORMAT)
+    async () =>
+      await copyTextToClipboardWithPort(PROGRAMMERS.COMMANDS.GET_FORMAT)
   );
   createFeatureBtn(
     section,
@@ -218,26 +222,18 @@ async function getLowerPart(): Promise<string> {
   );
   const info = await sendMessageWithPort({
     action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
-    data: { searchUrl, title },
+    data: { searchUrl, problemUrl: window.location.href },
     recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
   });
-  console.log("info", info);
-  /*   
-  백그라운드로 메시지 보내기
-    기존 탭 중에 해당 주소 창이 있는지 확인
-    없으면 현재 탭 왼쪽에 새 탭 열기(
-    chrome.tabs.create({url: "https://www.example.com"}, function(tab) { 
-      const createdTabId = tab.id;
-      ... 
-    }))
-    새 탭 열리고 잠시 후 주소 바뀌었는지 확인(chrome.tabs.onUpdated.addListener)
-  주소 바뀌었으면 옆 탭에서 초기화 버튼 누르기(sendMessage로 그 탭 콘텐트 스크립트)
-  검색 창에서 문제 정보 가져오기(백그라운드에서 다시 받아서 최초 실행 콘텐트로)
-  */
+  const { level, finCnt, accRate } = info;
+
   return PROGRAMMERS.TEMPLATES.LOWER.replace(
     GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG,
     problemTag
-  );
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY, level)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT, finCnt)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, accRate);
 }
 
 export async function getProgrammersFormat(): Promise<string> {
@@ -261,20 +257,30 @@ async function searchReset(): Promise<void> {
   }
 }
 
-export async function getProgrammersProblemInfo(originTitle): Promise<string> {
+export async function getProgrammersProblemInfo(problemUrl): Promise<{
+  level: string;
+  finCnt: string;
+  accRate: string;
+} | null> {
   searchReset();
-  const tableRow = await waitForElement(PROGRAMMERS.SELECTORS.tableRow, 600);
-  if (!tableRow) {
+  const table = await waitForElement(PROGRAMMERS.SELECTORS.table, 600);
+  if (!table) {
     return null;
   }
-  const level = tableRow.querySelector(PROGRAMMERS.SELECTORS.level).textContent;
-  const finCnt = tableRow.querySelector(
-    PROGRAMMERS.SELECTORS.finishedCnt
-  ).textContent;
-  const accRate = tableRow.querySelector(
-    PROGRAMMERS.SELECTORS.acceptanceRate
-  ).textContent;
-  return `${level} ${finCnt} ${accRate}`;
+  const tableRow = Array.from(table.querySelectorAll("tr")).find((row) => {
+    const titleA = row.querySelector(
+      PROGRAMMERS.SELECTORS.titleA
+    ) as HTMLAnchorElement;
+    return titleA.href === problemUrl;
+  });
+  if (!tableRow) return null;
+  const getContent = (selector: string) =>
+    tableRow.querySelector(selector)?.textContent || "";
+  return {
+    level: getContent(PROGRAMMERS.SELECTORS.level).replace(" ", ""),
+    finCnt: getContent(PROGRAMMERS.SELECTORS.finishedCnt),
+    accRate: getContent(PROGRAMMERS.SELECTORS.acceptanceRate),
+  };
 }
 
 export function handleProgrammersRequest(requestFunction) {

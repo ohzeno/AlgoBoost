@@ -48,11 +48,18 @@ chrome.runtime.onConnect.addListener(function (port) {
     port.onMessage.addListener(async function (message) {
       if (message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB) {
         const response = await handleProgrammersRequest(
-          async () => await getProgrammersProblemInfo(message.data.title)
+          async () => await getProgrammersProblemInfo(message.data.problemUrl)
         );
-        console.log(
-          `content before sendResponse ${new Date().toISOString()}\nres ${response}`
-        );
+        port.postMessage(response);
+      }
+    });
+  } else if (port.name === GLOBAL_CONSTANTS.PORT_NAMES.GET_FORMAT_TO_CONTENT) {
+    port.onMessage.addListener(async function (message) {
+      if (message.action === GLOBAL_CONSTANTS.COMMANDS.COPY) {
+        const command = message.data.getTextFunctionName;
+        const handler = commandHandlers[command];
+        if (!handler) return;
+        const response = await handler();
         port.postMessage(response);
       }
     });

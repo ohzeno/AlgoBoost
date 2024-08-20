@@ -223,7 +223,7 @@ function getStat(): BaekjoonProblemStats {
   const cells = Array.from(table.querySelectorAll("td"));
   const subCnt = cells[subIdx].textContent.trim();
   const accRate = cells[accIdx].textContent.trim().slice(0, -1); // Remove the '%' sign
-  return { subCnt: subCnt, accRate: accRate };
+  return { subCnt, accRate };
 }
 
 export function handleBaekjoonRequest(requestFunction) {

@@ -6,15 +6,13 @@ chrome.runtime.onConnect.addListener(function (port) {
   if (
     port.name !== GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_BACKGROUND
   ) {
-    console.error("Unexpected port name:", port.name);
     return;
   }
 
   port.onMessage.addListener(async function (message) {
     if (message.recipient !== GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND) return;
     if (message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST) {
-      const { searchUrl, title } = message.data;
-      console.log(`sender`, port.sender.url);
+      const { searchUrl, problemUrl } = message.data;
 
       try {
         let searchUrlTab = await getProgrammersSearchUrlTab(searchUrl);
@@ -28,7 +26,6 @@ chrome.runtime.onConnect.addListener(function (port) {
                   info
                 ) {
                   if (tabId === tab.id && info.status === "complete") {
-                    console.log(`bg tab created ${new Date().toISOString()}`);
                     chrome.tabs.onUpdated.removeListener(listener);
                     resolve(tab);
                   }
@@ -37,20 +34,14 @@ chrome.runtime.onConnect.addListener(function (port) {
             );
           });
         }
-        console.log(
-          `bg before sendMessageToTabPromise ${new Date().toISOString()}`
-        );
         const response = await sendMessageWithPort({
           action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB,
-          data: { title },
+          data: { problemUrl },
           recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
           tabId: searchUrlTab.id,
         });
-        console.log(`bg before response ${new Date().toISOString()}`);
-        console.log("response", response);
         port.postMessage(response);
       } catch (error) {
-        console.error("Error in background script:", error);
         port.postMessage({ error: error.message });
       }
     }

@@ -1,5 +1,5 @@
 import { getActiveTab } from "./tabUtils";
-import { GLOBAL_CONSTANTS } from "../constants";
+import { GLOBAL_CONSTANTS, PROGRAMMERS } from "../constants";
 
 export function sendMessageToBackground(action, data = {}) {
   chrome.runtime.sendMessage({
@@ -43,15 +43,22 @@ export function sendMessagePromise(message) {
 }
 
 export function sendMessageWithPort(message: any): Promise<any> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     let port;
     if (message.recipient === GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND) {
       port = chrome.runtime.connect({
         name: GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_BACKGROUND,
       });
-    } else if (message.recipient === GLOBAL_CONSTANTS.RECIPIENTS.CONTENT) {
+    } else if (
+      message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB
+    ) {
       port = chrome.tabs.connect(message.tabId, {
         name: GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_CONTENT,
+      });
+    } else if (message.action === GLOBAL_CONSTANTS.COMMANDS.COPY) {
+      const activeTab = await getActiveTab();
+      port = chrome.tabs.connect(activeTab.id, {
+        name: GLOBAL_CONSTANTS.PORT_NAMES.GET_FORMAT_TO_CONTENT,
       });
     }
 

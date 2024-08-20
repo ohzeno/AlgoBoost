@@ -27,6 +27,7 @@ export const GLOBAL_CONSTANTS = {
   PORT_NAMES: {
     GET_PROBLEM_INFO_TO_BACKGROUND: "get-problem-info-to-background",
     GET_PROBLEM_INFO_TO_CONTENT: "get-problem-info-to-content",
+    GET_FORMAT_TO_CONTENT: "get-format-to-content",
   },
 };
 
@@ -155,7 +156,7 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}`,
     LOWER: `"""
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
-${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}명, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}%
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
 """
 
 for inputdata in inputdatas:
@@ -176,7 +177,8 @@ for inputdata in inputdatas:
     editor: 'textarea#code[name="code"]',
     problemTag: "ol.breadcrumb > li:nth-child(2) > a",
     resetBtn: "button.init-button",
-    tableRow: "table tbody tr",
+    table: "table tbody",
+    titleA: ".title div a",
     level: ".level span",
     finishedCnt: ".finished-count",
     acceptanceRate: ".acceptance-rate",
