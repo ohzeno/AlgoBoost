@@ -24,6 +24,10 @@ export const GLOBAL_CONSTANTS = {
     FINISHED_CNT: "{FINISHED_CNT}",
     PARAMETER: "{PARAMETER}",
   },
+  PORT_NAMES: {
+    GET_PROBLEM_INFO_TO_BACKGROUND: "get-problem-info-to-background",
+    GET_PROBLEM_INFO_TO_CONTENT: "get-problem-info-to-content",
+  },
 };
 
 export const BAEKJOON = {
@@ -173,6 +177,9 @@ for inputdata in inputdatas:
     problemTag: "ol.breadcrumb > li:nth-child(2) > a",
     resetBtn: "button.init-button",
     tableRow: "table tbody tr",
+    level: ".level span",
+    finishedCnt: ".finished-count",
+    acceptanceRate: ".acceptance-rate",
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",

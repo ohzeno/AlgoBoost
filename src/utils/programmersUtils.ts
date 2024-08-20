@@ -2,10 +2,8 @@ import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
 import { PROGRAMMERS, GLOBAL_CONSTANTS } from "../constants";
 import { copyTextToClipboard } from "./clipboardUtils";
-import {
-  sendMessagePromise,
-  sendMessageToBackgroundWithPort,
-} from "./messageUtils";
+import { sendMessageWithPort } from "./messageUtils";
+import { waitForElement } from "./domUtils";
 
 function getMatches(url: string): ProgrammersRegExpMatches {
   return {
@@ -218,9 +216,9 @@ async function getLowerPart(): Promise<string> {
     GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER,
     customUrlEncode(title)
   );
-  const info = await sendMessageToBackgroundWithPort({
+  const info = await sendMessageWithPort({
     action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
-    data: { searchUrl },
+    data: { searchUrl, title },
     recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
   });
   console.log("info", info);
@@ -254,30 +252,29 @@ export async function getProgrammersFormat(): Promise<string> {
 }
 
 async function searchReset(): Promise<void> {
-  const resetBtn = document.querySelector<HTMLButtonElement>(
-    PROGRAMMERS.SELECTORS.resetBtn
-  );
+  const resetBtn = (await waitForElement(
+    PROGRAMMERS.SELECTORS.resetBtn,
+    300
+  )) as HTMLButtonElement;
   if (resetBtn) {
     resetBtn.click();
-    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 }
 
-export async function getProgrammersProblemInfo(
-  searchUrl: string
-): Promise<string> {
-  console.log("ㅎㅇ");
+export async function getProgrammersProblemInfo(originTitle): Promise<string> {
   searchReset();
-  let tableRow = document.querySelector(PROGRAMMERS.SELECTORS.tableRow);
+  const tableRow = await waitForElement(PROGRAMMERS.SELECTORS.tableRow, 600);
   if (!tableRow) {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    tableRow = document.querySelector(PROGRAMMERS.SELECTORS.tableRow);
+    return null;
   }
-  const level = tableRow.querySelector(".level span").textContent;
-  const finCnt = tableRow.querySelector(".finished-count").textContent;
-  const accRate = tableRow.querySelector(".acceptance-rate").textContent;
-  console.log(`level: ${level}, finishCnt: ${finCnt}, accCnt: ${accRate}`);
-  return "test";
+  const level = tableRow.querySelector(PROGRAMMERS.SELECTORS.level).textContent;
+  const finCnt = tableRow.querySelector(
+    PROGRAMMERS.SELECTORS.finishedCnt
+  ).textContent;
+  const accRate = tableRow.querySelector(
+    PROGRAMMERS.SELECTORS.acceptanceRate
+  ).textContent;
+  return `${level} ${finCnt} ${accRate}`;
 }
 
 export function handleProgrammersRequest(requestFunction) {

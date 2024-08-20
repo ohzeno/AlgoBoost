@@ -1,9 +1,11 @@
 import { PROGRAMMERS, GLOBAL_CONSTANTS } from "./constants";
 import { getProgrammersSearchUrlTab } from "./utils/tabUtils";
-import { sendMessageToTabPromise } from "./utils/messageUtils";
+import { sendMessageWithPort } from "./utils/messageUtils";
 
 chrome.runtime.onConnect.addListener(function (port) {
-  if (port.name !== "problem-info") {
+  if (
+    port.name !== GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_BACKGROUND
+  ) {
     console.error("Unexpected port name:", port.name);
     return;
   }
@@ -11,7 +13,7 @@ chrome.runtime.onConnect.addListener(function (port) {
   port.onMessage.addListener(async function (message) {
     if (message.recipient !== GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND) return;
     if (message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST) {
-      const { searchUrl } = message.data;
+      const { searchUrl, title } = message.data;
       console.log(`sender`, port.sender.url);
 
       try {
@@ -26,6 +28,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                   info
                 ) {
                   if (tabId === tab.id && info.status === "complete") {
+                    console.log(`bg tab created ${new Date().toISOString()}`);
                     chrome.tabs.onUpdated.removeListener(listener);
                     resolve(tab);
                   }
@@ -37,12 +40,14 @@ chrome.runtime.onConnect.addListener(function (port) {
         console.log(
           `bg before sendMessageToTabPromise ${new Date().toISOString()}`
         );
-        const response = await sendMessageToTabPromise(searchUrlTab.id, {
+        const response = await sendMessageWithPort({
           action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB,
+          data: { title },
           recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
+          tabId: searchUrlTab.id,
         });
         console.log(`bg before response ${new Date().toISOString()}`);
-
+        console.log("response", response);
         port.postMessage(response);
       } catch (error) {
         console.error("Error in background script:", error);

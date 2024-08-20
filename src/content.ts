@@ -28,8 +28,6 @@ const commandHandlers = {
     handleProgrammersRequest(getProgrammersFormat),
   [PROGRAMMERS.COMMANDS.GET_TITLE]: () =>
     handleProgrammersRequest(getProgrammersTitle),
-  [PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB]: () =>
-    handleProgrammersRequest(getProgrammersProblemInfo),
 };
 
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
@@ -37,15 +35,26 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   let command;
   if (message.action === GLOBAL_CONSTANTS.COMMANDS.COPY) {
     command = message.data.getTextFunctionName;
-  } else if (
-    message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB
-  ) {
-    command = message.action;
   }
   const handler = commandHandlers[command];
   if (!handler) return;
   const response = await handler();
-  console.log("content before response", response);
   sendResponse(response);
   return true;
+});
+
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_CONTENT) {
+    port.onMessage.addListener(async function (message) {
+      if (message.action === PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_FROM_TAB) {
+        const response = await handleProgrammersRequest(
+          async () => await getProgrammersProblemInfo(message.data.title)
+        );
+        console.log(
+          `content before sendResponse ${new Date().toISOString()}\nres ${response}`
+        );
+        port.postMessage(response);
+      }
+    });
+  }
 });
