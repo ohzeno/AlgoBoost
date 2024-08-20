@@ -18,7 +18,6 @@ export function sendMessageToTabPromise(
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
       } else {
-        console.log("sendMessageToTabPromise response", response);
         resolve(response);
       }
     });
@@ -43,10 +42,33 @@ export function sendMessagePromise(message) {
   });
 }
 
-export function sendMessageToBackgroundWithPort(message: any): Promise<any> {
+export function sendMessageWithPort(message: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    const port = chrome.runtime.connect({ name: "problem-info" });
+    let port;
+    if (message.recipient === GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND) {
+      port = chrome.runtime.connect({
+        name: GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_BACKGROUND,
+      });
+    } else if (message.recipient === GLOBAL_CONSTANTS.RECIPIENTS.CONTENT) {
+      port = chrome.tabs.connect(message.tabId, {
+        name: GLOBAL_CONSTANTS.PORT_NAMES.GET_PROBLEM_INFO_TO_CONTENT,
+      });
+    }
 
+    sendMessageThroughPort(port, message)
+      .then(resolve)
+      .catch(reject)
+      .finally(() => {
+        port.disconnect();
+      });
+  });
+}
+
+function sendMessageThroughPort(
+  port: chrome.runtime.Port,
+  message: any
+): Promise<any> {
+  return new Promise((resolve, reject) => {
     const listener = (response: any) => {
       if (response.error) {
         reject(new Error(response.error));
@@ -54,9 +76,7 @@ export function sendMessageToBackgroundWithPort(message: any): Promise<any> {
         resolve(response);
       }
       port.onMessage.removeListener(listener);
-      port.disconnect();
     };
-
     port.onMessage.addListener(listener);
     port.postMessage(message);
   });
