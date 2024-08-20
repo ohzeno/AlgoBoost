@@ -8,6 +8,7 @@ module.exports = {
     // background: "./src/background.ts",
     popup: "./src/popup.ts",
     content: "./src/content.ts",
+    background: "./src/background.ts",
   },
   output: {
     filename: "[name].js", // [name]은 entry 속성명(content, background, popup)에 따라 동적으로 결정됨

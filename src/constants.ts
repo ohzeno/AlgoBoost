@@ -1,5 +1,40 @@
+export const GLOBAL_CONSTANTS = {
+  BULLET_TYPES: {
+    disc: "•",
+    circle: "◦",
+    square: "▪",
+  },
+  COMMANDS: {
+    COPY: "copy",
+  },
+  RECIPIENTS: {
+    BACKGROUND: "background",
+    CONTENT: "content",
+  },
+  TEMPLATE_VAR: {
+    URL: "{URL}",
+    BASE_CODE: "{BASE_CODE}",
+    CONSTRAINTS: "{CONSTRAINTS}",
+    INPUTDATAS: "{INPUTDATAS}",
+    PROBLEM_TAG: "{PROBLEM_TAG}",
+    DIFFICULTY: "{DIFFICULTY}",
+    SUBMISSIONS: "{SUBMISSIONS}",
+    ACCEPTANCE_RATE: "{ACCEPTANCE_RATE}",
+    TIER: "{TIER}",
+    FINISHED_CNT: "{FINISHED_CNT}",
+    PARAMETER: "{PARAMETER}",
+  },
+  PORT_NAMES: {
+    GET_PROBLEM_INFO_TO_BACKGROUND: "get-problem-info-to-background",
+    GET_PROBLEM_INFO_TO_CONTENT: "get-problem-info-to-content",
+    GET_FORMAT_TO_CONTENT: "get-format-to-content",
+  },
+};
+
 export const BAEKJOON = {
-  BASE_URL: "https://www.acmicpc.net",
+  URLS: {
+    BASE: "https://www.acmicpc.net",
+  },
   REGEX: {
     problem: /^https:\/\/www\.acmicpc\.net\/problem\/(\d+)$/,
     solver:
@@ -14,7 +49,7 @@ export const BAEKJOON = {
   TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
   RANKS: ["V", "IV", "III", "II", "I"],
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 import sys
 # sys.stdin = open('input.txt')
 def input():
@@ -22,13 +57,13 @@ def input():
 """
 """`,
     LOWER: `"""
-현 시점 {TIER}. 제출 {SUBCNT}. 정답률 {ACCRATE} %
+현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
 """`,
   },
   SELECTORS: {
     exampleElems: ".sampledata",
     tier: "img.solvedac-tier",
-    tdElems: "#problem-info > tbody > tr > td",
+    problemInfoTable: "#problem-info",
   },
   COMMANDS: {
     GET_EXAMPLE: "getBaekjoonExample",
@@ -41,26 +76,28 @@ def input():
 };
 
 export const LEETCODE = {
-  BASE_URL: "https://leetcode.com",
+  URLS: {
+    BASE: "https://leetcode.com",
+  },
   REGEX: {
     problem: /^https:\/\/leetcode\.com\/problems\/.+/,
   },
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 from typing import Optional, List
 
 """
 constraints:
-{CONSTRAINTS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 """
 
 
-{BASE_CODE}`,
-    LOWER: `{INPUTDATAS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}`,
+    LOWER: `${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
 
 """
-LeetCode {DIFFICULTY}.
-제출 {SUBMISSIONS}, 정답률 {ACCEPTANCERATE}%
+LeetCode ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}.
+제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
 
 """
 import inspect
@@ -93,7 +130,10 @@ for inputdata in inputdatas:
 };
 
 export const PROGRAMMERS = {
-  BASE_URL: "https://programmers.co.kr",
+  URLS: {
+    BASE: "https://programmers.co.kr",
+    SEARCH: `https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search=${GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER}`,
+  },
   REGEX: {
     problem_list:
       /^https:\/\/school\.programmers\.co\.kr\/learn\/challenges(?:\/(?:beginner|training))?\?order=[^&]+(&.*)?$/,
@@ -103,20 +143,20 @@ export const PROGRAMMERS = {
       /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
   },
   TEMPLATES: {
-    UPPER: `# {URL}
+    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 """
 constraints:
-{CONSTRAINTS}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 """
 
 
-{BASE_CODE}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
 
 
-{INPUTDATAS}`,
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}`,
     LOWER: `"""
-{PROBLEM_TAG}
-{DIFFICULTY}. 현 시점 완료한 사람 {COMPLETE_CNT}명, 정답률 {ACCEPTANCERATE}%
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
 """
 
 for inputdata in inputdatas:
@@ -135,15 +175,19 @@ for inputdata in inputdatas:
   SELECTORS: {
     title: "div.lesson-content",
     editor: 'textarea#code[name="code"]',
+    problemTag: "ol.breadcrumb > li:nth-child(2) > a",
+    resetBtn: "button.init-button",
+    table: "table tbody",
+    titleA: ".title div a",
+    level: ".level span",
+    finishedCnt: ".finished-count",
+    acceptanceRate: ".acceptance-rate",
   },
   COMMANDS: {
     GET_FORMAT: "getProgrammersFormat",
     GET_TITLE: "getProgrammersTitle",
+    GET_PROBLEM_INFO_REQUEST: "getProgrammersProblemInfoRequest",
+    GET_PROBLEM_INFO_FROM_TAB: "getProgrammersProblemInfoFromTab",
+    SEARCH_RESET: "programmersSearchReset",
   },
-};
-
-export const BULLET_TYPES = {
-  disc: "•",
-  circle: "◦",
-  square: "▪",
 };

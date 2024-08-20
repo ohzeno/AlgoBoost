@@ -1,6 +1,6 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
-import { BAEKJOON } from "../constants";
+import { GLOBAL_CONSTANTS, BAEKJOON } from "../constants";
 import { divMod } from "./mathUtils";
 import { copyTextToClipboard } from "./clipboardUtils";
 
@@ -113,7 +113,7 @@ async function handleBaekjoonTab(type: baekjoonTabType) {
 function getNewUrl(tabType: string, problemNumber: string): string {
   const typeStr =
     tabType === BAEKJOON.TAB_TYPES.SOLVED_USERS ? "problem" : "short";
-  return `${BAEKJOON.BASE_URL}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
+  return `${BAEKJOON.URLS.BASE}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
 }
 
 export function getBaekjoonExample(): string {
@@ -165,15 +165,21 @@ function getUpperPart(): string {
     대신 window.location.href를 사용하여 현재 url을 가져옴.
   */
   const curUrl = window.location.href;
-  return BAEKJOON.TEMPLATES.UPPER.replace("{URL}", curUrl);
+  return BAEKJOON.TEMPLATES.UPPER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
+    curUrl
+  );
 }
 
 function getLowerPart(): string {
   const tierStr = getTierStr();
   const { subCnt, accRate } = getStat();
-  return BAEKJOON.TEMPLATES.LOWER.replace("{TIER}", tierStr)
-    .replace("{SUBCNT}", subCnt)
-    .replace("{ACCRATE}", accRate);
+  return BAEKJOON.TEMPLATES.LOWER.replace(
+    GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER,
+    tierStr
+  )
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, subCnt)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, accRate);
 }
 
 function getTierStr(): string {
@@ -198,14 +204,26 @@ function getTierStr(): string {
 }
 
 function getStat(): BaekjoonProblemStats {
-  const tdElems = document.querySelectorAll(BAEKJOON.SELECTORS.tdElems);
-  if (!tdElems || tdElems.length < 6) {
-    // showNotification("Failed to get table");
+  const table = document.querySelector<HTMLTableElement>(
+    BAEKJOON.SELECTORS.problemInfoTable
+  );
+  if (!table) {
+    // showNotification("Failed to get problem info table");
     return null;
   }
-  const subCnt = tdElems[3].textContent.trim();
-  const accRate = tdElems[5].textContent.trim().slice(0, -1);
-  return { subCnt: subCnt, accRate: accRate };
+  const headers = Array.from(table.querySelectorAll("th"));
+  const subIdx = headers.findIndex((th) => th.textContent.trim() === "제출");
+  const accIdx = headers.findIndex(
+    (th) => th.textContent.trim() === "정답 비율"
+  );
+  if (subIdx === -1 || accIdx === -1) {
+    console.error("Required columns not found in the table");
+    return null;
+  }
+  const cells = Array.from(table.querySelectorAll("td"));
+  const subCnt = cells[subIdx].textContent.trim();
+  const accRate = cells[accIdx].textContent.trim().slice(0, -1); // Remove the '%' sign
+  return { subCnt, accRate };
 }
 
 export function handleBaekjoonRequest(requestFunction) {
