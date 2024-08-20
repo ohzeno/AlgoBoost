@@ -12,9 +12,6 @@
         "https://www.acmicpc.net/problem/*",
         "https://leetcode.com/problems/*",
         "https://school.programmers.co.kr/learn/challenges?order=*",
-        "https://school.programmers.co.kr/learn/challenges/beginner*",
-        "https://school.programmers.co.kr/learn/challenges/training*",
-        "https://school.programmers.co.kr/learn/courses/30/parts/*",
         "https://school.programmers.co.kr/learn/courses/30/lessons/*"
       ],
       "exclude_matches": [

@@ -15,6 +15,7 @@ chrome.runtime.onConnect.addListener(function (port) {
       const { searchUrl, problemUrl } = message.data;
 
       try {
+        let created;
         let searchUrlTab = await getProgrammersSearchUrlTab(searchUrl);
         if (!searchUrlTab) {
           searchUrlTab = await new Promise((resolve) => {
@@ -27,6 +28,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 ) {
                   if (tabId === tab.id && info.status === "complete") {
                     chrome.tabs.onUpdated.removeListener(listener);
+                    created = true;
                     resolve(tab);
                   }
                 });
@@ -40,6 +42,8 @@ chrome.runtime.onConnect.addListener(function (port) {
           recipient: GLOBAL_CONSTANTS.RECIPIENTS.CONTENT,
           tabId: searchUrlTab.id,
         });
+        if (created) chrome.tabs.remove(searchUrlTab.id);
+
         port.postMessage(response);
       } catch (error) {
         port.postMessage({ error: error.message });
