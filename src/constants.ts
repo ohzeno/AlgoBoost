@@ -135,10 +135,6 @@ export const PROGRAMMERS = {
     SEARCH: `https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search=${GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER}`,
   },
   REGEX: {
-    problem_list:
-      /^https:\/\/school\.programmers\.co\.kr\/learn\/challenges(?:\/(?:beginner|training))?\?order=[^&]+(&.*)?$/,
-    specilal_problem_list:
-      /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/parts\/\d+$/,
     problem:
       /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
   },
@@ -167,8 +163,8 @@ for inputdata in inputdatas:
     else:
         summary = "fail"
         for label, content in [("expected:", ans), ("got:", res)]:
-            summary += f"\n  {label}\n"
-            summary += f"    {content}\n"
+            summary += f"\\n  {label}\\n"
+            summary += f"    {content}\\n"
             summary = summary.rstrip()
         print(summary)`,
   },
