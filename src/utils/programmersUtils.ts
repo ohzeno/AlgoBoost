@@ -8,23 +8,10 @@ import {
 import { sendMessageWithPort } from "./messageUtils";
 import { waitForElement } from "./domUtils";
 
-function getMatches(url: string): ProgrammersRegExpMatches {
-  return {
-    problemListMatch: url.match(PROGRAMMERS.REGEX.problem_list),
-    specialProblemListMatch: url.match(PROGRAMMERS.REGEX.specilal_problem_list),
-    problemMatch: url.match(PROGRAMMERS.REGEX.problem),
-  };
-}
-
 async function validatePage(): Promise<boolean> {
   const pageUrl: string = await getPageUrl();
-  const { problemListMatch, specialProblemListMatch, problemMatch } =
-    getMatches(pageUrl);
-  const isValidPage = !!(
-    problemListMatch ||
-    specialProblemListMatch ||
-    problemMatch
-  );
+  const problemMatch = pageUrl.match(PROGRAMMERS.REGEX.problem);
+  const isValidPage = !!problemMatch;
   if (isValidPage) return true;
   // showNotification("This is not a Programmers page");
   return false;
@@ -220,12 +207,11 @@ async function getLowerPart(): Promise<string> {
     GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER,
     customUrlEncode(title)
   );
-  const info = await sendMessageWithPort({
+  const { level, finCnt, accRate } = await sendMessageWithPort({
     action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
     data: { searchUrl, problemUrl: window.location.href },
     recipient: GLOBAL_CONSTANTS.RECIPIENTS.BACKGROUND,
   });
-  const { level, finCnt, accRate } = info;
 
   return PROGRAMMERS.TEMPLATES.LOWER.replace(
     GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG,
