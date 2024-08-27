@@ -93,7 +93,23 @@ function processListItems(ul: Element, depth: number = 0): string[] {
     const bullet = getBullet(depth, li, index);
     const indent = "  ".repeat(depth + 1);
 
-    let text = htmlToText(li)
+    let text = Array.from(li.childNodes)
+      .map((node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.textContent;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as Element;
+          if (el.tagName === "P") {
+            return el.textContent;
+          } else if (el.tagName === "CODE") {
+            return el.textContent;
+          } else if (el.tagName === "SUP") {
+            return `^${el.textContent}`;
+          }
+        }
+        return "";
+      })
+      .join("")
       .replace(/\s+/g, " ")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
