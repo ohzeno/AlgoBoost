@@ -29,6 +29,18 @@ export const GLOBAL_CONSTANTS = {
     GET_PROBLEM_INFO_TO_CONTENT: "get-problem-info-to-content",
     GET_FORMAT_TO_CONTENT: "get-format-to-content",
   },
+  REPLACE_DICT: {
+    "\\": "＼",
+    "/": "／",
+    "|": "｜",
+    "?": "？",
+    '"': "“",
+    "*": "＊",
+    ":": "：",
+    ".": "․",
+    "<": "＜",
+    ">": "＞",
+  },
 };
 
 export const BAEKJOON = {
