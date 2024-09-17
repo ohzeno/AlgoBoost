@@ -7,6 +7,7 @@ import {
 } from "./clipboardUtils";
 import { sendMessageWithPort } from "./messageUtils";
 import { waitForElement } from "./domUtils";
+import { sanitizeText } from "./textUtils";
 
 async function validatePage(): Promise<boolean> {
   const pageUrl: string = await getPageUrl();
@@ -45,7 +46,7 @@ export function getProgrammersTitle(): string {
     return null;
   }
   const title = titleElement.dataset.lessonTitle;
-  return title;
+  return sanitizeText(title);
 }
 
 function extractEditorCode(): string {
