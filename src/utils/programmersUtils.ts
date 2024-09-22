@@ -22,7 +22,7 @@ export async function createProgrammersSection(): Promise<void> {
   const isValidPage = await validatePage();
   if (!isValidPage) return;
 
-  const section = createSection("프로그래머스");
+  const section = await createSection("프로그래머스");
 
   createFeatureBtn(
     section,

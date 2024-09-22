@@ -17,17 +17,36 @@ body.dark-mode {
   margin-bottom: 5px;
   border: 1px solid #444;
   border-radius: 10px;
-  padding: 15px 10px 10px;
+  padding: 20px 10px 10px;
+}
+
+.section-header {
+  position: absolute;
+  width: 90%;
+  top: -10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dark-mode .section-title {
-  position: absolute;
   top: -10px;
   left: 10px;
   background-color: #1f1f1f;
   padding: 0 5px;
   font-weight: bold;
   font-size: 16px;
+}
+
+.language-select {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 14px;
 }
 
 .dark-mode .feature-button {

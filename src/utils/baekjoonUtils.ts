@@ -25,7 +25,7 @@ export async function createBaekjoonSection(): Promise<void> {
   const isValidPage = await validatePage();
   if (!isValidPage) return;
 
-  const section = createSection("백준");
+  const section = await createSection("백준");
 
   createFeatureBtn(
     section,
