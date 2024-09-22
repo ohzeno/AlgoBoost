@@ -3,6 +3,7 @@ import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { GLOBAL_CONSTANTS, BAEKJOON } from "../constants";
 import { divMod } from "./mathUtils";
 import { copyTextToClipboard } from "./clipboardUtils";
+import { getStoredLanguage } from "./storageUtils";
 
 function getMatches(url: string): BaekjoonRegExpMatches {
   return {
@@ -75,7 +76,8 @@ function getPageInfo(url: string): {
 function getOrder(
   type: baekjoonTabType,
   urlType: string | null,
-  languageNumber: string | null
+  languageNumber: string | null,
+  trgLanguageNumber: string
 ): "SAME_PAGE" | "UPDATE_TAB" | "NEW_TAB" {
   const isSameType =
     urlType &&
@@ -84,9 +86,7 @@ function getOrder(
 
   if (isSameType)
     // 같은 페이지면 언어만 일치시켜주면 됨.
-    return languageNumber === BAEKJOON.LANG_CODES.PYTHON
-      ? "SAME_PAGE"
-      : "UPDATE_TAB";
+    return languageNumber === trgLanguageNumber ? "SAME_PAGE" : "UPDATE_TAB";
 
   return "NEW_TAB";
 }
@@ -95,11 +95,13 @@ async function handleBaekjoonTab(type: baekjoonTabType) {
   const { id, url, index } = await getActiveTab();
   const pageInfo = getPageInfo(url);
   const { problemNumber, urlType, languageNumber } = pageInfo;
-  const newUrl = getNewUrl(type, problemNumber);
-  const order = getOrder(type, urlType, languageNumber);
+  const targetLanguage = await getStoredLanguage();
+  const trgLanguageNumber = BAEKJOON.LANG_CODES[targetLanguage] || "1003";
+  const newUrl = await getNewUrl(type, problemNumber, trgLanguageNumber);
+  const order = getOrder(type, urlType, languageNumber, trgLanguageNumber);
   if (order === "SAME_PAGE") {
-    // 이미 python 페이지인 경우
-    // showNotification(`This is already a ${type} python page`);
+    // 이미 targetLanguage 페이지인 경우
+    // showNotification(`This is already a ${type} {targetLanguage} page`);
     return;
   } else if (order === "UPDATE_TAB") {
     // ${urlType}/status 페이지면 언어만 바꿔주면 됨.
@@ -110,10 +112,14 @@ async function handleBaekjoonTab(type: baekjoonTabType) {
   else createNewTabToRight(newUrl, index);
 }
 
-function getNewUrl(tabType: string, problemNumber: string): string {
+async function getNewUrl(
+  tabType: string,
+  problemNumber: string,
+  languageNumber: string
+): Promise<string> {
   const typeStr =
     tabType === BAEKJOON.TAB_TYPES.SOLVED_USERS ? "problem" : "short";
-  return `${BAEKJOON.URLS.BASE}/${typeStr}/status/${problemNumber}/${BAEKJOON.LANG_CODES.PYTHON}/1`;
+  return `${BAEKJOON.URLS.BASE}/${typeStr}/status/${problemNumber}/${languageNumber}/1`;
 }
 
 export function getBaekjoonExample(): string {

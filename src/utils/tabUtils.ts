@@ -14,6 +14,8 @@ export async function createNewTabToRight(
   const rightTab = tabs.find((tab) => tab.index === index + 1);
   if (rightTab && rightTab.url === newUrl) {
     // showNotification("New tab is already opened");
+    // focus on the tab
+    await chrome.tabs.highlight({ tabs: index + 1 });
     return;
   }
   await chrome.tabs.create({ url: newUrl, index: index + 1 });

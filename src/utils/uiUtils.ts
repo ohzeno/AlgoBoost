@@ -42,9 +42,9 @@ async function createLanguageSelector(): Promise<HTMLSelectElement> {
   const storedLanguage = await getStoredLanguage();
   for (const [key, value] of Object.entries(GLOBAL_CONSTANTS.LANGUAGES)) {
     const option = document.createElement("option");
-    option.value = value;
+    option.value = key;
     option.textContent = value;
-    if (value === storedLanguage) option.selected = true;
+    if (key === storedLanguage) option.selected = true;
     languageSelector.appendChild(option);
   }
 
