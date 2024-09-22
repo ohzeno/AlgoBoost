@@ -2,7 +2,10 @@ import { createSection, createFeatureBtn } from "./uiUtils";
 import { getActiveTab, createNewTabToRight, getPageUrl } from "./tabUtils";
 import { GLOBAL_CONSTANTS, BAEKJOON } from "../constants";
 import { divMod } from "./mathUtils";
-import { copyTextToClipboard } from "./clipboardUtils";
+import {
+  copyTextToClipboard,
+  copyTextToClipboardWithPort,
+} from "./clipboardUtils";
 import { getStoredLanguage } from "./storageUtils";
 
 function getMatches(url: string): BaekjoonRegExpMatches {
@@ -48,7 +51,7 @@ export async function createBaekjoonSection(): Promise<void> {
   createFeatureBtn(
     section,
     "양식 복사",
-    async () => await copyTextToClipboard(BAEKJOON.COMMANDS.GET_FORMAT)
+    async () => await copyTextToClipboardWithPort(BAEKJOON.COMMANDS.GET_FORMAT)
   );
 }
 
@@ -159,31 +162,33 @@ function formatExampleData(exampleData: BaekjoonExampleData[]): string {
   return `inputdatas = [\n${formattedData}\n]`;
 }
 
-export function getBaekjoonFormat(): string {
-  const upperPart = getUpperPart();
-  const lowerPart = getLowerPart();
+export async function getBaekjoonFormat(): Promise<string> {
+  const targetLanguage = await getStoredLanguage();
+  const upperPart = getUpperPart(targetLanguage);
+  const lowerPart = getLowerPart(targetLanguage);
   return `${upperPart}\n\n\n\n${lowerPart}\n`;
 }
 
-function getUpperPart(): string {
+function getUpperPart(targetLanguage): string {
   /* content스크립트 -> getBaekjoonFormat -> getUpperPart
     content script에서 실행되므로 chrome.tabs API를 사용할 수 없음.
     대신 window.location.href를 사용하여 현재 url을 가져옴.
   */
   const curUrl = window.location.href;
-  return BAEKJOON.TEMPLATES.UPPER.replace(
-    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
-    curUrl
-  );
+  const upperTemplate =
+    BAEKJOON.TEMPLATES[targetLanguage]?.UPPER ||
+    BAEKJOON.TEMPLATES.PYTHON.UPPER;
+  return upperTemplate.replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.URL, curUrl);
 }
 
-function getLowerPart(): string {
+function getLowerPart(targetLanguage): string {
   const tierStr = getTierStr();
   const { subCnt, accRate } = getStat();
-  return BAEKJOON.TEMPLATES.LOWER.replace(
-    GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER,
-    tierStr
-  )
+  const lowerTemplate =
+    BAEKJOON.TEMPLATES[targetLanguage]?.LOWER ||
+    BAEKJOON.TEMPLATES.PYTHON.LOWER;
+  return lowerTemplate
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER, tierStr)
     .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, subCnt)
     .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, accRate);
 }

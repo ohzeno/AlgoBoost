@@ -69,16 +69,43 @@ export const BAEKJOON = {
   TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
   RANKS: ["V", "IV", "III", "II", "I"],
   TEMPLATES: {
-    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+    PYTHON: {
+      UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 import sys
 # sys.stdin = open('input.txt')
 def input():
     return sys.stdin.readline().rstrip()
 """
 """`,
-    LOWER: `"""
+      LOWER: `"""
 현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
 """`,
+    },
+    JAVA: {
+      UPPER: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+
+import java.io.*;
+import java.util.*;
+
+/*
+
+ */`,
+      LOWER: `public class Main {
+    static String INPUT = "input.txt";
+    static BufferedReader br;
+
+    public static void main(String[] args) throws IOException {
+        br = new BufferedReader(new FileReader(INPUT));
+//        br = new BufferedReader(new InputStreamReader(System.in));
+
+    }
+}
+
+
+/*
+현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
+*/`,
+    },
   },
   SELECTORS: {
     exampleElems: ".sampledata",
