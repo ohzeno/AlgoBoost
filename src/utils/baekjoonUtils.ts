@@ -166,7 +166,8 @@ export async function getBaekjoonFormat(): Promise<string> {
   const targetLanguage = await getStoredLanguage();
   const upperPart = getUpperPart(targetLanguage);
   const lowerPart = getLowerPart(targetLanguage);
-  return `${upperPart}\n\n\n\n${lowerPart}\n`;
+  const languageSpaces = BAEKJOON.LANGUAGE_SPACES[targetLanguage] || 4;
+  return `${upperPart}${"\n".repeat(languageSpaces)}${lowerPart}\n`;
 }
 
 function getUpperPart(targetLanguage): string {

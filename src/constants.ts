@@ -89,8 +89,10 @@ import java.util.*;
 
 /*
 
- */`,
-      LOWER: `public class Main {
+ */
+
+
+public class Main {
     static String INPUT = "input.txt";
     static BufferedReader br;
 
@@ -99,13 +101,15 @@ import java.util.*;
 //        br = new BufferedReader(new InputStreamReader(System.in));
 
     }
-}
-
-
-/*
+}`,
+      LOWER: `/*
 현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
 */`,
     },
+  },
+  LANGUAGE_SPACES: {
+    PYTHON: 4,
+    JAVA: 3,
   },
   SELECTORS: {
     exampleElems: ".sampledata",
