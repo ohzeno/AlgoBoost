@@ -16,7 +16,7 @@ export async function createLeetcodeSection(): Promise<void> {
   const isValidPage = await validatePage();
   if (!isValidPage) return;
 
-  const section = createSection("LeetCode");
+  const section = await createSection("LeetCode");
 
   createFeatureBtn(
     section,
