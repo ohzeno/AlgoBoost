@@ -41,6 +41,12 @@ export const GLOBAL_CONSTANTS = {
     "<": "＜",
     ">": "＞",
   },
+  LANGUAGES: {
+    PYTHON: "Python",
+    JAVA: "Java",
+    JAVASCRIPT: "JavaScript",
+    SQL: "SQL",
+  },
 };
 
 export const BAEKJOON = {
@@ -57,6 +63,7 @@ export const BAEKJOON = {
   },
   LANG_CODES: {
     PYTHON: "1003",
+    JAVA: "1002",
   },
   TIERS: ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"],
   RANKS: ["V", "IV", "III", "II", "I"],
