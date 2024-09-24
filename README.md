@@ -13,3 +13,5 @@ BaekJoon, Programmers, LeetCode의 문제 페이지에서만 popup에 기능과 
 ![](resources\프로그래머스.png)
 
 ![](resources\릿코드.png)
+
+개인 용도의 확장프로그램이라 기능을 우선해서 개발했기에 알림 ui는 존재하지 않는다. [Youtube-Script-Extractor](https://chromewebstore.google.com/detail/youtube-script-extractor/jcabnnjnoeeiblfhdponchmlkoocekbo?hl=ko&authuser=6)에서 사용했던 알림 시스템을 가져오기만 해도 되지만, 혼자 쓰는 프로그램이니 그 시간에 다른 개발을 하는게 낫다고 생각했다.
