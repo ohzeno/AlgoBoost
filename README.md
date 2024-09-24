@@ -8,8 +8,8 @@ BaekJoon, Programmers, LeetCode의 문제 양식, 제목, 예제 등을 자동�
 
 BaekJoon, Programmers, LeetCode의 문제 페이지에서만 popup에 기능과 언어 선택이 나타난다.
 
-![](resources\백준.png)
+![](resources/백준.png)
 
-![](resources\프로그래머스.png)
+![](resources/프로그래머스.png)
 
-![](resources\릿코드.png)
+![](resources/릿코드.png)
