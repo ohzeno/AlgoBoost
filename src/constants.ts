@@ -23,6 +23,8 @@ export const GLOBAL_CONSTANTS = {
     TIER: "{TIER}",
     FINISHED_CNT: "{FINISHED_CNT}",
     PARAMETER: "{PARAMETER}",
+    DATA: "{DATA}",
+    ANSWER: "{ANSWER}",
   },
   PORT_NAMES: {
     GET_PROBLEM_INFO_TO_BACKGROUND: "get-problem-info-to-background",
@@ -93,12 +95,12 @@ import java.util.*;
 
 
 public class Main {
-    static String INPUT = "input.txt";
+//    static String INPUT = "input.txt";
     static BufferedReader br;
 
     public static void main(String[] args) throws IOException {
-        br = new BufferedReader(new FileReader(INPUT));
-//        br = new BufferedReader(new InputStreamReader(System.in));
+//        br = new BufferedReader(new FileReader(INPUT));
+        br = new BufferedReader(new InputStreamReader(System.in));
 
     }
 }`,
@@ -184,13 +186,14 @@ export const PROGRAMMERS = {
   URLS: {
     BASE: "https://programmers.co.kr",
     SEARCH: `https://school.programmers.co.kr/learn/challenges?order=acceptance_desc&page=1&search=${GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER}`,
+    problem: `https://school.programmers.co.kr/learn/courses/30/lessons`,
   },
   REGEX: {
     problem:
-      /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/\d+$/,
+      /^https:\/\/school\.programmers\.co\.kr\/learn\/courses\/30\/lessons\/(\d+)(\?language=([a-zA-Z0-9]+))?$/,
   },
   TEMPLATES: {
-    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+    PYTHON: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 """
 constraints:
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
@@ -200,8 +203,10 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
 
 
-${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}`,
-    LOWER: `"""
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+
+
+"""
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
 """
@@ -217,7 +222,64 @@ for inputdata in inputdatas:
             summary += f"\\n  {label}\\n"
             summary += f"    {content}\\n"
             summary = summary.rstrip()
-        print(summary)`,
+        print(summary)
+`,
+    JAVA: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+
+import java.util.List;
+import java.util.Map;
+
+/*
+constraints:
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
+*/
+
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
+
+/*
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
+*/
+
+public class Main {
+    public static void main(String[] args) {
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+
+        Solution solution = new Solution();
+
+        for (Map<String, Object> inputdata : inputdatas) {
+            Object data = inputdata.get("data");
+            Object ans = inputdata.get("answer");
+
+            Object res = solution.solution((List<Object>) data);
+
+            if (res.equals(ans)) {
+                System.out.println("pass");
+            } else {
+                String summary = "fail";
+                summary += "\n  expected:\n";
+                summary += "    " + ans;
+                summary += "\n  got:\n";
+                summary += "    " + res;
+                System.out.println(summary);
+            }
+        }
+    }
+}
+`,
+    JAVASCRIPT: ``,
+    EXAMPLES: {
+      PYTHON: {
+        start: "inputdatas = [",
+        item: `    {"data": [${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}], "answer": ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
+        end: "]",
+      },
+      JAVA: {
+        start: "        List<Map<String, Object>> inputdatas = List.of(",
+        item: `                Map.of("data", List.of(${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}), "answer", ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER})`,
+        end: "        );",
+      },
+    },
   },
   SELECTORS: {
     title: "div.lesson-content",
