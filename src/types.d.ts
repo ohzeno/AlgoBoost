@@ -15,3 +15,16 @@ interface BaekjoonProblemStats {
   subCnt: string;
   accRate: string;
 }
+
+interface ProgrammersTemplateData1 {
+  baseCode: string;
+  constraints: string;
+  examples: string;
+}
+
+interface ProgrammersTemplateData2 {
+  problemTag: string;
+  level: string;
+  finCnt: string;
+  accRate: string;
+}

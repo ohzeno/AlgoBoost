@@ -166,11 +166,12 @@ export async function getBaekjoonFormat(): Promise<string> {
   const targetLanguage = await getStoredLanguage();
   const upperPart = getUpperPart(targetLanguage);
   const lowerPart = getLowerPart(targetLanguage);
-  const languageSpaces = BAEKJOON.LANGUAGE_SPACES[targetLanguage] || 4;
+  const languageSpaces =
+    BAEKJOON.LANGUAGE_SPACES[targetLanguage] || BAEKJOON.LANGUAGE_SPACES.PYTHON;
   return `${upperPart}${"\n".repeat(languageSpaces)}${lowerPart}\n`;
 }
 
-function getUpperPart(targetLanguage): string {
+function getUpperPart(targetLanguage: string): string {
   /* content스크립트 -> getBaekjoonFormat -> getUpperPart
     content script에서 실행되므로 chrome.tabs API를 사용할 수 없음.
     대신 window.location.href를 사용하여 현재 url을 가져옴.
@@ -182,7 +183,7 @@ function getUpperPart(targetLanguage): string {
   return upperTemplate.replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.URL, curUrl);
 }
 
-function getLowerPart(targetLanguage): string {
+function getLowerPart(targetLanguage: string): string {
   const tierStr = getTierStr();
   const { subCnt, accRate } = getStat();
   const lowerTemplate =
