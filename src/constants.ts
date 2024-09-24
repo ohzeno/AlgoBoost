@@ -267,7 +267,40 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
     }
 }
 `,
-    JAVASCRIPT: ``,
+    JAVASCRIPT: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+
+/*
+constraints:
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
+*/
+
+
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
+
+
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+
+/*
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.PROBLEM_TAG}
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}. 현 시점 완료한 사람 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FINISHED_CNT}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
+*/
+
+for (let i = 0; i < inputDatas.length; i++) {
+    const {data, answer} = inputDatas[i];
+    const res = solution(...data);
+    if (JSON.stringify(res) === JSON.stringify(answer)) {
+        console.log("pass");
+    } else {
+        let summary = "fail";
+        for (const [label, content] of [["expected:", answer], ["got:", res]]) {
+            summary += \`\\n  \${label}\\n\`;
+            summary += \`    \${content}\`;
+            summary = summary.trimEnd();
+        }
+        console.log(summary);
+    }
+}
+`,
     EXAMPLES: {
       PYTHON: {
         start: "inputdatas = [",
@@ -278,6 +311,11 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
         start: "        List<Map<String, Object>> inputdatas = List.of(",
         item: `                Map.of("data", List.of(${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}), "answer", ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER})`,
         end: "        );",
+      },
+      JAVASCRIPT: {
+        start: "const inputDatas = [",
+        item: `    {data: [${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}], answer: ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
+        end: "];",
       },
     },
   },
