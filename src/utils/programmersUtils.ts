@@ -175,8 +175,19 @@ function formatJavaData(data: any): string {
     .map((item) => {
       const parsed = parseJavaItem(item);
       if (Array.isArray(parsed)) {
-        const elems = parsed.map((el) => JSON.stringify(el)).join(", ");
-        return `new Object[]{${elems}}`;
+        if (parsed.every(Array.isArray)) {
+          // 2차원 배열 처리
+          const nestedArrays = parsed
+            .map((subArray) => {
+              const elems = subArray.map((el) => JSON.stringify(el)).join(", ");
+              return `new Object[]{${elems}}`;
+            })
+            .join(", ");
+          return `new Object[][]{${nestedArrays}}`;
+        } else {
+          const elems = parsed.map((el) => JSON.stringify(el)).join(", ");
+          return `new Object[]{${elems}}`;
+        }
       }
       return item;
     })
