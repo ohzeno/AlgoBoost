@@ -158,6 +158,42 @@ function parseExampleElements(tableElem: HTMLTableElement): any[] {
   return exampleData;
 }
 
+function parseJavaItem(item: any): any {
+  if (typeof item === "string") {
+    try {
+      return JSON.parse(item);
+    } catch (error) {
+      return item;
+    }
+  }
+  return item;
+}
+
+function formatJavaData(data: any): string {
+  if (!Array.isArray(data)) return data;
+  return data
+    .map((item) => {
+      const parsed = parseJavaItem(item);
+      if (Array.isArray(parsed)) {
+        if (parsed.every(Array.isArray)) {
+          // 2차원 배열 처리
+          const nestedArrays = parsed
+            .map((subArray) => {
+              const elems = subArray.map((el) => JSON.stringify(el)).join(", ");
+              return `new Object[]{${elems}}`;
+            })
+            .join(", ");
+          return `new Object[][]{${nestedArrays}}`;
+        } else {
+          const elems = parsed.map((el) => JSON.stringify(el)).join(", ");
+          return `new Object[]{${elems}}`;
+        }
+      }
+      return item;
+    })
+    .join(", ");
+}
+
 function formatExampleData(targetLanguage, exampleData: any[]): string {
   const template =
     PROGRAMMERS.TEMPLATES.EXAMPLES[targetLanguage] ||
@@ -165,7 +201,14 @@ function formatExampleData(targetLanguage, exampleData: any[]): string {
 
   const formattedItems = exampleData
     .map(({ data, answer }) => {
-      let dataStr = Array.isArray(data) ? data.join(", ") : data;
+      let dataStr;
+      if (targetLanguage === "JAVA") {
+        dataStr = formatJavaData(data);
+        // formatJavaData는 배열을 처리하므로 배열로 감싸줘야 answer 자체가 배열일 때 처리 가능
+        answer = formatJavaData([answer]);
+      } else {
+        dataStr = Array.isArray(data) ? data.join(", ") : data;
+      }
       return template.item
         .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA, dataStr)
         .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER, answer);
