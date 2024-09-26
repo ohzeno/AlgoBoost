@@ -226,8 +226,7 @@ for inputdata in inputdatas:
 `,
     JAVA: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
 constraints:
@@ -257,9 +256,9 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
                 System.out.println("pass");
             } else {
                 String summary = "fail";
-                summary += "\n  expected:\n";
+                summary += "\\n  expected:\\n";
                 summary += "    " + ans;
-                summary += "\n  got:\n";
+                summary += "\\n  got:\\n";
                 summary += "    " + res;
                 System.out.println(summary);
             }
