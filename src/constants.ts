@@ -25,6 +25,7 @@ export const GLOBAL_CONSTANTS = {
     PARAMETER: "{PARAMETER}",
     DATA: "{DATA}",
     ANSWER: "{ANSWER}",
+    FUNCTION_NAME: "{FUNCTION_NAME}",
   },
   PORT_NAMES: {
     GET_PROBLEM_INFO_TO_BACKGROUND: "get-problem-info-to-background",
@@ -136,7 +137,8 @@ export const LEETCODE = {
     problem: /^https:\/\/leetcode\.com\/problems\/.+/,
   },
   TEMPLATES: {
-    UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+    PYTHON: {
+      UPPER: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 from typing import Optional, List
 
 """
@@ -146,7 +148,7 @@ ${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 
 
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}`,
-    LOWER: `${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+      LOWER: `${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
 
 """
 LeetCode ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}.
@@ -170,6 +172,52 @@ for inputdata in inputdatas:
             summary += f"    {content}"
             summary = summary.rstrip()
         print(summary)`,
+    },
+    JAVASCRIPT: {
+      UPPER: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+
+/*
+constraints:
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
+*/
+
+
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}`,
+      LOWER: `${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+
+/*
+LeetCode ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}.
+제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
+*/
+
+for (let i = 0; i < inputDatas.length; i++) {
+    const {data, answer} = inputDatas[i];
+    const res = ${GLOBAL_CONSTANTS.TEMPLATE_VAR.FUNCTION_NAME}(...data);
+    if (JSON.stringify(res) === JSON.stringify(answer)) {
+        console.log("pass");
+    } else {
+        let summary = "fail";
+        for (const [label, content] of [["expected:", answer], ["got:", res]]) {
+            summary += \`\\n  \${label}\\n\`;
+            summary += \`    \${content}\`;
+            summary = summary.trimEnd();
+        }
+        console.log(summary);
+    }
+}`,
+    },
+    EXAMPLES: {
+      PYTHON: {
+        start: "inputdatas = [",
+        item: `    {"data": [${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}], "answer": ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
+        end: "]",
+      },
+      JAVASCRIPT: {
+        start: "const inputDatas = [",
+        item: `    {data: [${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}], answer: ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
+        end: "];",
+      },
+    },
   },
   SELECTORS: {
     description: "#description_tabbar_outer",
