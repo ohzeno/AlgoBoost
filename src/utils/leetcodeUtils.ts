@@ -1,7 +1,11 @@
 import { createSection, createFeatureBtn } from "./uiUtils";
 import { getPageUrl } from "./tabUtils";
 import { GLOBAL_CONSTANTS, LEETCODE } from "../constants";
-import { copyTextToClipboard } from "./clipboardUtils";
+import {
+  copyTextToClipboard,
+  copyTextToClipboardWithPort,
+} from "./clipboardUtils";
+import { getStoredLanguage } from "./storageUtils";
 
 async function validatePage(): Promise<boolean> {
   const pageUrl: string = await getPageUrl();
@@ -21,7 +25,7 @@ export async function createLeetcodeSection(): Promise<void> {
   createFeatureBtn(
     section,
     "Copy Format",
-    async () => await copyTextToClipboard(LEETCODE.COMMANDS.GET_FORMAT)
+    async () => await copyTextToClipboardWithPort(LEETCODE.COMMANDS.GET_FORMAT)
   );
   createFeatureBtn(
     section,
@@ -91,22 +95,29 @@ function extractEditorCode() {
   return codeLines.join("\n");
 }
 
-function getUpperPart(problemDescriptionDiv: HTMLDivElement): string {
+function getUpperPart(
+  targetLanguage: string,
+  problemDescriptionDiv: HTMLDivElement,
+  baseCode: string
+): string {
   const curUrl = window.location.href.replace(/\/description\/$/, "/");
   const constraints = getConstraints(problemDescriptionDiv);
-  const baseCode = extractEditorCode();
-  return LEETCODE.TEMPLATES.UPPER.replace(
-    GLOBAL_CONSTANTS.TEMPLATE_VAR.URL,
-    curUrl
-  )
+  const upperTemplate =
+    LEETCODE.TEMPLATES[targetLanguage]?.UPPER ||
+    LEETCODE.TEMPLATES.PYTHON.UPPER;
+  return upperTemplate
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.URL, curUrl)
     .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS, constraints)
     .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE, baseCode);
 }
 
-function getExamples(problemDescriptionDiv: HTMLDivElement): string {
+function getExamples(
+  targetLanguage: string,
+  problemDescriptionDiv: HTMLDivElement
+): string {
   const exampleDivs = problemDescriptionDiv.querySelectorAll("pre");
   const exampleData = parseExampleElements(exampleDivs);
-  return formatExampleData(exampleData);
+  return formatExampleData(targetLanguage, exampleData);
 }
 
 function parseExampleElements(exampleDivs: NodeListOf<Element>): any[] {
@@ -147,14 +158,18 @@ function parseInput(inputText: string): any[] {
   return inputArray;
 }
 
-function formatExampleData(exampleData: any[]): string {
+function formatExampleData(targetLanguage, exampleData: any[]): string {
+  const template =
+    LEETCODE.TEMPLATES.EXAMPLES[targetLanguage] ||
+    LEETCODE.TEMPLATES.EXAMPLES.PYTHON;
+
   const formattedData = exampleData
     .map(
       ({ data, answer }) =>
         `    {"data": [${data.join(", ")}], "answer": ${answer}}`
     )
     .join(",\n");
-  return `inputdatas = [\n${formattedData}\n]`;
+  return `${template.start}\n${formattedData}\n${template.end}`;
 }
 
 function getDifficultyStr(problemDescriptionDiv: HTMLDivElement): string {
@@ -194,20 +209,32 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
   return { submissions, acceptanceRate };
 }
 
-function getLowerPart(problemDescriptionDiv: HTMLDivElement): string {
-  const examples = getExamples(problemDescriptionDiv);
-  const difficulty = getDifficultyStr(problemDescriptionDiv);
-  const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
-  return LEETCODE.TEMPLATES.LOWER.replace(
-    GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY,
-    difficulty
-  )
-    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS, examples)
-    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, submissions)
-    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, acceptanceRate);
+function getFirstFunctionName(code: string): string {
+  const match = code.match(/(?:function|var|const|let)\s+(\w+)\s*=/);
+  return match ? match[1] : "";
 }
 
-export function getLeetcodeFormat(): string {
+function getLowerPart(
+  targetLanguage: string,
+  problemDescriptionDiv: HTMLDivElement,
+  baseCode: string
+): string {
+  const examples = getExamples(targetLanguage, problemDescriptionDiv);
+  const difficulty = getDifficultyStr(problemDescriptionDiv);
+  const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
+  const functionName = getFirstFunctionName(baseCode);
+  const lowerTemplate =
+    LEETCODE.TEMPLATES[targetLanguage]?.LOWER ||
+    LEETCODE.TEMPLATES.PYTHON.LOWER;
+  return lowerTemplate
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY, difficulty)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS, examples)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS, submissions)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE, acceptanceRate)
+    .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.FUNCTION_NAME, functionName);
+}
+
+export async function getLeetcodeFormat(): Promise<string> {
   const problemDescriptionDiv = Array.from(
     document.querySelectorAll("div")
   ).find(
@@ -217,8 +244,18 @@ export function getLeetcodeFormat(): string {
       div.textContent.includes("Output") &&
       div.textContent.includes("Constraints")
   );
-  const upperPart = getUpperPart(problemDescriptionDiv);
-  const lowerPart = getLowerPart(problemDescriptionDiv);
+  const targetLanguage = await getStoredLanguage();
+  const baseCode = extractEditorCode();
+  const upperPart = getUpperPart(
+    targetLanguage,
+    problemDescriptionDiv,
+    baseCode
+  );
+  const lowerPart = getLowerPart(
+    targetLanguage,
+    problemDescriptionDiv,
+    baseCode
+  );
   return `${upperPart}\n\n\n${lowerPart}\n`;
 }
 
