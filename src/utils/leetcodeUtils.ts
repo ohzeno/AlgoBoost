@@ -61,7 +61,10 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
         if (li instanceof HTMLElement) {
           let html = li.innerHTML;
           // <sup> 태그로 표현된 지수를 ^ 기호로 변경
-          html = html.replace(/(\d+)<sup>(\d+)<\/sup>/g, "$1^$2");
+          html = html.replace(
+            /([0-9a-zA-Z]+)<sup>([0-9a-zA-Z]+)<\/sup>/g,
+            "$1^$2"
+          );
           // HTML 엔티티를 적절한 기호로 변경
           html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
           html = html.replace(/<\/?code>/g, ""); // code 태그 제거
