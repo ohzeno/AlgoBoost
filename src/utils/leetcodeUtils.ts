@@ -79,23 +79,84 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
 }
 
 function extractEditorCode() {
+  // 1. 라인 넘버와 top 위치 매핑
+  const lineNumbers = document.querySelectorAll(".line-numbers");
+  if (!lineNumbers.length) {
+    // showNotification("Failed to get the line numbers");
+    return null;
+  }
+  const lineNumberMap = new Map<number, number>();
+
+  lineNumbers.forEach((ln) => {
+    const lineDiv = ln.closest('[style*="top:"]') as HTMLDivElement;
+    if (!lineDiv) return;
+
+    const top = parseInt(lineDiv.style.top);
+    const number = parseInt(ln.textContent || "0");
+    if (!isNaN(top) && !isNaN(number)) {
+      lineNumberMap.set(top, number);
+    }
+  });
+
+  // 2. 코드 라인 추출 및 HTML 처리
   const editorLines = document.querySelector(".view-lines");
   if (!editorLines) {
     // showNotification("Failed to get the editor code");
     return null;
   }
-  const lines = editorLines.querySelectorAll(".view-line");
 
-  // 각 줄의 텍스트 내용 추출, 공백 유지
-  const codeLines = Array.from(lines).map((line) => {
-    return line.innerHTML
+  const lines = editorLines.querySelectorAll(".view-line");
+  const codeMap = new Map<number, string[]>();
+
+  lines.forEach((line) => {
+    const top = parseInt(
+      line.getAttribute("style")?.match(/top:(\d+)px/)?.[1] || "0"
+    );
+    if (isNaN(top)) return;
+
+    const text = line.innerHTML
       .replace(/<[^>]*>/g, "") // HTML 태그 제거
       .replace(/&nbsp;/g, " ") // &nbsp;를 일반 공백으로 변환
       .replace(/&gt;/g, ">") // &gt;를 >로 변환
       .replace(/&lt;/g, "<") // &lt;를 <로 변환
       .replace(/&amp;/g, "&"); // &amp;를 &로 변환
+
+    if (!codeMap.has(top)) {
+      codeMap.set(top, []);
+    }
+    codeMap.get(top)?.push(text);
   });
-  return codeLines.join("\n");
+
+  // 3. 라인 번호 순서대로 코드 재구성
+  const sortedLines: string[] = [];
+  const processedTops = new Set<number>();
+
+  Array.from(lineNumberMap.entries())
+    .sort(([_, a], [__, b]) => a - b)
+    .forEach(([top, lineNum]) => {
+      const codeLines = codeMap.get(top);
+      if (codeLines) {
+        processedTops.add(top);
+        sortedLines[lineNum - 1] = codeLines.join("");
+      }
+    });
+
+  // 4. 소프트랩 라인 처리
+  codeMap.forEach((lines, top) => {
+    if (!processedTops.has(top)) {
+      const prevTop = Math.max(
+        ...Array.from(lineNumberMap.keys()).filter((t) => t < top)
+      );
+
+      if (lineNumberMap.has(prevTop)) {
+        const lineNum = lineNumberMap.get(prevTop)!;
+        sortedLines[lineNum - 1] =
+          (sortedLines[lineNum - 1] || "") + lines.join("");
+      }
+    }
+  });
+
+  return sortedLines.filter(Boolean).join("\n");
 }
 
 function getUpperPart(
