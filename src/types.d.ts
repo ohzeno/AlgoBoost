@@ -28,3 +28,5 @@ interface ProgrammersTemplateData2 {
   finCnt: string;
   accRate: string;
 }
+
+type LineNumberMap = Map<number, number>;

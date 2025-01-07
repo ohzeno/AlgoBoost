@@ -78,25 +78,31 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
   return "  " + constraints.join("\n  ");
 }
 
-function extractEditorCode() {
-  // 1. 라인 넘버와 top 위치 매핑
+function createLineNumberMap(): LineNumberMap | null {
   const lineNumbers = document.querySelectorAll(".line-numbers");
-  if (!lineNumbers.length) {
-    // showNotification("Failed to get the line numbers");
-    return null;
-  }
-  const lineNumberMap = new Map<number, number>();
+  if (!lineNumbers.length) return null;
+
+  const map: LineNumberMap = new Map();
 
   lineNumbers.forEach((ln) => {
     const lineDiv = ln.closest('[style*="top:"]') as HTMLDivElement;
     if (!lineDiv) return;
-
     const top = parseInt(lineDiv.style.top);
     const number = parseInt(ln.textContent || "0");
     if (!isNaN(top) && !isNaN(number)) {
-      lineNumberMap.set(top, number);
+      map.set(top, number);
     }
   });
+  return map;
+}
+
+function extractEditorCode() {
+  // 1. 라인 넘버와 top 위치 매핑
+  const lineNumberMap = createLineNumberMap();
+  if (!lineNumberMap) {
+    // showNotification("Failed to get the line numbers");
+    return null;
+  }
 
   // 2. 코드 라인 추출 및 HTML 처리
   const editorLines = document.querySelector(".view-lines");
