@@ -126,6 +126,26 @@ function createEditorCodeMap(): EditorCodeMap | null {
   return codeMap;
 }
 
+function createSortedLinesAndProcessedTops(
+  lineNumberMap: LineNumberMap,
+  codeMap: EditorCodeMap
+): [sortedLines, processedTops] {
+  const sortedLines: sortedLines = [];
+  const processedTops = new Set<number>();
+
+  Array.from(lineNumberMap.entries())
+    .sort(([_, a], [__, b]) => a - b)
+    .forEach(([top, lineNum]) => {
+      const codeLines = codeMap.get(top);
+      if (codeLines) {
+        processedTops.add(top);
+        sortedLines[lineNum - 1] = codeLines.join("");
+      }
+    });
+
+  return [sortedLines, processedTops];
+}
+
 function extractEditorCode() {
   // 1. 라인 넘버와 top 위치 매핑
   const lineNumberMap = createLineNumberMap();
@@ -142,18 +162,10 @@ function extractEditorCode() {
   }
 
   // 3. 라인 번호 순서대로 코드 재구성
-  const sortedLines: string[] = [];
-  const processedTops = new Set<number>();
-
-  Array.from(lineNumberMap.entries())
-    .sort(([_, a], [__, b]) => a - b)
-    .forEach(([top, lineNum]) => {
-      const codeLines = codeMap.get(top);
-      if (codeLines) {
-        processedTops.add(top);
-        sortedLines[lineNum - 1] = codeLines.join("");
-      }
-    });
+  const [sortedLines, processedTops] = createSortedLinesAndProcessedTops(
+    lineNumberMap,
+    codeMap
+  );
 
   // 4. 소프트랩 라인 처리
   codeMap.forEach((lines, top) => {

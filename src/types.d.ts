@@ -32,3 +32,7 @@ interface ProgrammersTemplateData2 {
 type LineNumberMap = Map<number, number>;
 
 type EditorCodeMap = Map<number, string[]>;
+
+type sortedLines = string[];
+
+type processedTops = Set<number>;
