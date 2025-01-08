@@ -96,7 +96,7 @@ function createLineNumberMap(): LineNumberMap | null {
   return map;
 }
 
-function extractEditorLines(): EditorCodeMap | null {
+function createEditorCodeMap(): EditorCodeMap | null {
   const editorLines = document.querySelector(".view-lines");
   if (!editorLines) {
     return null;
@@ -135,7 +135,7 @@ function extractEditorCode() {
   }
 
   // 2. 코드 라인 추출 및 HTML 처리
-  const codeMap = extractEditorLines();
+  const codeMap = createEditorCodeMap();
   if (!codeMap) {
     // showNotification("Failed to get the editor code");
     return null;
