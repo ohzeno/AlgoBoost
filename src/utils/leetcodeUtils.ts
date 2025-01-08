@@ -96,18 +96,9 @@ function createLineNumberMap(): LineNumberMap | null {
   return map;
 }
 
-function extractEditorCode() {
-  // 1. 라인 넘버와 top 위치 매핑
-  const lineNumberMap = createLineNumberMap();
-  if (!lineNumberMap) {
-    // showNotification("Failed to get the line numbers");
-    return null;
-  }
-
-  // 2. 코드 라인 추출 및 HTML 처리
+function extractEditorLines(): EditorCodeMap | null {
   const editorLines = document.querySelector(".view-lines");
   if (!editorLines) {
-    // showNotification("Failed to get the editor code");
     return null;
   }
 
@@ -132,6 +123,23 @@ function extractEditorCode() {
     }
     codeMap.get(top)?.push(text);
   });
+  return codeMap;
+}
+
+function extractEditorCode() {
+  // 1. 라인 넘버와 top 위치 매핑
+  const lineNumberMap = createLineNumberMap();
+  if (!lineNumberMap) {
+    // showNotification("Failed to get the line numbers");
+    return null;
+  }
+
+  // 2. 코드 라인 추출 및 HTML 처리
+  const codeMap = extractEditorLines();
+  if (!codeMap) {
+    // showNotification("Failed to get the editor code");
+    return null;
+  }
 
   // 3. 라인 번호 순서대로 코드 재구성
   const sortedLines: string[] = [];
