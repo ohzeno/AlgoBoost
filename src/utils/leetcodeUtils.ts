@@ -146,6 +146,29 @@ function createSortedLinesAndProcessedTops(
   return [sortedLines, processedTops];
 }
 
+function processSoftWrapLines(
+  codeMap: EditorCodeMap,
+  lineNumberMap: LineNumberMap,
+  sortedLines: sortedLines,
+  processedTops: processedTops
+): string[] {
+  codeMap.forEach((lines, top) => {
+    if (!processedTops.has(top)) {
+      const prevTop = Math.max(
+        ...Array.from(lineNumberMap.keys()).filter((t) => t < top)
+      );
+
+      if (lineNumberMap.has(prevTop)) {
+        const lineNum = lineNumberMap.get(prevTop)!;
+        sortedLines[lineNum - 1] =
+          (sortedLines[lineNum - 1] || "") + lines.join("");
+      }
+    }
+  });
+
+  return sortedLines;
+}
+
 function extractEditorCode() {
   // 1. 라인 넘버와 top 위치 매핑
   const lineNumberMap = createLineNumberMap();
@@ -168,21 +191,14 @@ function extractEditorCode() {
   );
 
   // 4. 소프트랩 라인 처리
-  codeMap.forEach((lines, top) => {
-    if (!processedTops.has(top)) {
-      const prevTop = Math.max(
-        ...Array.from(lineNumberMap.keys()).filter((t) => t < top)
-      );
+  const processedLines = processSoftWrapLines(
+    codeMap,
+    lineNumberMap,
+    sortedLines,
+    processedTops
+  );
 
-      if (lineNumberMap.has(prevTop)) {
-        const lineNum = lineNumberMap.get(prevTop)!;
-        sortedLines[lineNum - 1] =
-          (sortedLines[lineNum - 1] || "") + lines.join("");
-      }
-    }
-  });
-
-  return sortedLines.filter(Boolean).join("\n");
+  return processedLines.filter(Boolean).join("\n");
 }
 
 function getUpperPart(
