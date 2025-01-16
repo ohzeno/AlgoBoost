@@ -1,6 +1,7 @@
 import {
   getBaekjoonExample,
   getBaekjoonFormat,
+  getBaekjoonTitle,
   handleBaekjoonRequest,
 } from "./utils/baekjoonUtils";
 import {
@@ -21,6 +22,7 @@ const commandHandlers = {
     handleBaekjoonRequest(getBaekjoonExample),
   [BAEKJOON.COMMANDS.GET_FORMAT]: () =>
     handleBaekjoonRequest(getBaekjoonFormat),
+  [BAEKJOON.COMMANDS.GET_TITLE]: () => handleBaekjoonRequest(getBaekjoonTitle),
   [LEETCODE.COMMANDS.GET_FORMAT]: () =>
     handleLeetcodeRequest(getLeetcodeFormat),
   [LEETCODE.COMMANDS.GET_TITLE]: () => handleLeetcodeRequest(getLeetcodeTitle),
