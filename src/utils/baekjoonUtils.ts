@@ -53,6 +53,20 @@ export async function createBaekjoonSection(): Promise<void> {
     "양식 복사",
     async () => await copyTextToClipboardWithPort(BAEKJOON.COMMANDS.GET_FORMAT)
   );
+  createFeatureBtn(
+    section,
+    "제목 복사",
+    async () => await copyTextToClipboard(BAEKJOON.COMMANDS.GET_TITLE)
+  );
+}
+
+export function getBaekjoonTitle(): string {
+  const titleElement = document.querySelector(BAEKJOON.SELECTORS.title);
+  if (!titleElement) {
+    // showNotification("Failed to get titleElement");
+    return null;
+  }
+  return titleElement.textContent.trim();
 }
 
 function getPageInfo(url: string): {

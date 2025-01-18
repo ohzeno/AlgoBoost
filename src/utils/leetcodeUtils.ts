@@ -47,6 +47,14 @@ export function getLeetcodeTitle(): string {
   return title;
 }
 
+function getBullet(li: Element, index: number): string {
+  const computedStyle = window.getComputedStyle(li);
+  const listStyleType = computedStyle.getPropertyValue("list-style-type");
+
+  if (listStyleType === "decimal") return `${index + 1}.`;
+  return GLOBAL_CONSTANTS.BULLET_TYPES[listStyleType];
+}
+
 function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
   const constraintsHeader = Array.from(
     problemDescriptionDiv.querySelectorAll("p strong")
@@ -57,22 +65,25 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
   if (constraintsHeader && constraintsHeader.parentElement) {
     const nextElement = constraintsHeader.parentElement.nextElementSibling;
     if (nextElement instanceof HTMLUListElement) {
-      constraints = Array.from(nextElement.querySelectorAll("li")).map((li) => {
-        if (li instanceof HTMLElement) {
-          let html = li.innerHTML;
-          // <sup> 태그로 표현된 지수를 ^ 기호로 변경
-          html = html.replace(
-            /([0-9a-zA-Z]+)<sup>([0-9a-zA-Z]+)<\/sup>/g,
-            "$1^$2"
-          );
-          // HTML 엔티티를 적절한 기호로 변경
-          html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-          html = html.replace(/<\/?code>/g, ""); // code 태그 제거
-          let result = html.replace(/<[^>]*>/g, ""); // 남은 HTML 태그 제거
-          return result;
+      constraints = Array.from(nextElement.querySelectorAll("li")).map(
+        (li, index) => {
+          if (li instanceof HTMLElement) {
+            const bullet = getBullet(li, index);
+            let html = li.innerHTML;
+            // <sup> 태그로 표현된 지수를 ^ 기호로 변경
+            html = html.replace(
+              /([0-9a-zA-Z]+)<sup>([0-9a-zA-Z]+)<\/sup>/g,
+              "$1^$2"
+            );
+            // HTML 엔티티를 적절한 기호로 변경
+            html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            html = html.replace(/<\/?code>/g, ""); // code 태그 제거
+            let result = html.replace(/<[^>]*>/g, ""); // 남은 HTML 태그 제거
+            return `${bullet} ${result}`;
+          }
+          return "";
         }
-        return "";
-      });
+      );
     }
   }
   return "  " + constraints.join("\n  ");

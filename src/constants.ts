@@ -118,10 +118,12 @@ public class Main {
     exampleElems: ".sampledata",
     tier: "img.solvedac-tier",
     problemInfoTable: "#problem-info",
+    title: "#problem_title",
   },
   COMMANDS: {
     GET_EXAMPLE: "getBaekjoonExample",
     GET_FORMAT: "getBaekjoonFormat",
+    GET_TITLE: "getBaekjoonTitle",
   },
   TAB_TYPES: {
     SOLVED_USERS: "Solved Users",
