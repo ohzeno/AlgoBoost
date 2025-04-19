@@ -232,7 +232,13 @@ function getExamples(
   targetLanguage: string,
   problemDescriptionDiv: HTMLDivElement
 ): string {
-  const exampleDivs = problemDescriptionDiv.querySelectorAll("pre");
+  let exampleDivs: HTMLElement[] | NodeListOf<Element> =
+    problemDescriptionDiv.querySelectorAll("pre");
+  let exampleType = "pre";
+  if (exampleDivs.length === 0) {
+    exampleDivs = problemDescriptionDiv.querySelectorAll(".example-block");
+    exampleType = "example-block";
+  }
   const exampleData = parseExampleElements(exampleDivs);
   return formatExampleData(targetLanguage, exampleData);
 }
