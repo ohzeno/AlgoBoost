@@ -239,11 +239,14 @@ function getExamples(
     exampleDivs = problemDescriptionDiv.querySelectorAll(".example-block");
     exampleType = "example-block";
   }
-  const exampleData = parseExampleElements(exampleDivs);
+  const exampleData = parseExampleElements(exampleDivs, exampleType);
   return formatExampleData(targetLanguage, exampleData);
 }
 
-function parseExampleElements(exampleDivs: NodeListOf<Element>): any[] {
+function parseExampleElements(
+  exampleDivs: NodeListOf<Element>,
+  exampleType: string
+): any[] {
   const exampleData: any[] = [];
   for (const exampleDiv of exampleDivs) {
     const strongElements = exampleDiv.querySelectorAll("strong");
@@ -257,10 +260,18 @@ function parseExampleElements(exampleDivs: NodeListOf<Element>): any[] {
       }
     }
     if (!(inputElement && outputElement)) continue;
-    const inputElemText = inputElement.nextSibling?.textContent?.trim() ?? "";
+    let inputElemText = inputElement.nextSibling?.textContent?.trim() ?? "";
+    let outputElemText = outputElement.nextSibling?.textContent?.trim() ?? "";
+
+    if (exampleType === "example-block") {
+      inputElemText =
+        inputElement.nextElementSibling?.textContent?.trim() ?? "";
+      outputElemText =
+        outputElement.nextElementSibling?.textContent?.trim() ?? "";
+    }
     exampleData.push({
       data: parseInput(inputElemText),
-      answer: outputElement.nextSibling?.textContent?.trim() ?? "",
+      answer: outputElemText,
     });
   }
   return exampleData;
