@@ -84,6 +84,19 @@ def input():
 현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
 """`,
     },
+    JAVASCRIPT: {
+      UPPER: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+const realFile = process.platform === "linux" ? "/dev/stdin" : "input.txt";
+const realCodeLines = require("fs").readFileSync(realFile).toString().trim().split("\n");
+let realCodeLineIdx = 0;
+const input = () => realCodeLines[realCodeLineIdx++];
+/*
+constraints:
+*/`,
+      LOWER: `/*
+현 시점 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.TIER}. 제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}. 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE} %
+*/`,
+    },
     JAVA: {
       UPPER: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 
