@@ -278,16 +278,11 @@ function parseExampleElements(
 }
 
 function parseInput(inputText: string): any[] {
-  /* 
-  split 사용하니 혹시나 파라미터 값에 ', '가 나오거나 ' = '가 나오면
-  문제 생길 수 있음.
-  개인 용도 플젝이고, 그런 문제는 드무니 일단은 그냥 쓰고 버그 생겼을 때 수정하자.
-  */
   const inputArray = [];
-  const parameters = inputText.split(", ");
-  for (const parameter of parameters) {
-    const value = parameter.split(" = ")[1];
-    inputArray.push(value);
+  const paramRegex = /(\w+) = ("(?:[^"\\]|\\.)*"|\[.*?\]|[^,]+)/g;
+  let match;
+  while ((match = paramRegex.exec(inputText)) !== null) {
+    inputArray.push(match[2].trim());
   }
   return inputArray;
 }
