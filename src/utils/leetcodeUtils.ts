@@ -325,7 +325,7 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
     problemDescriptionDiv.querySelectorAll("div")
   ).find(
     (div) =>
-      div.textContent.includes("Submissions") &&
+      div.textContent.includes("Accepted") &&
       div.textContent.includes("Acceptance Rate")
   );
   let submissions = "",
@@ -333,8 +333,9 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
   if (statsDiv) {
     const statElements = statsDiv.querySelectorAll("div");
     statElements.forEach((el) => {
-      if (el.textContent?.includes("Submissions")) {
-        submissions = el.nextElementSibling?.textContent?.trim() ?? "";
+      if (el.textContent?.includes("Accepted")) {
+        submissions =
+          el.nextElementSibling?.textContent?.split("/")[1]?.trim() ?? "";
       } else if (el.textContent?.includes("Acceptance Rate")) {
         acceptanceRate = el.nextElementSibling?.textContent?.trim() || "";
       }
