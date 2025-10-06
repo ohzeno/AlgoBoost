@@ -239,13 +239,18 @@ function getExamples(
     exampleDivs = problemDescriptionDiv.querySelectorAll(".example-block");
     exampleType = "example-block";
   }
-  const exampleData = parseExampleElements(exampleDivs, exampleType);
+  const exampleData = parseExampleElements(
+    exampleDivs,
+    exampleType,
+    targetLanguage
+  );
   return formatExampleData(targetLanguage, exampleData);
 }
 
 function parseExampleElements(
   exampleDivs: NodeListOf<Element>,
-  exampleType: string
+  exampleType: string,
+  targetLanguage: string
 ): any[] {
   const exampleData: any[] = [];
   for (const exampleDiv of exampleDivs) {
@@ -268,6 +273,11 @@ function parseExampleElements(
         inputElement.nextElementSibling?.textContent?.trim() ?? "";
       outputElemText =
         outputElement.nextElementSibling?.textContent?.trim() ?? "";
+    }
+    if (targetLanguage === "PYTHON") {
+      outputElemText = outputElemText
+        .replace(/\bfalse\b/g, "False")
+        .replace(/\btrue\b/g, "True");
     }
     exampleData.push({
       data: parseInput(inputElemText),
