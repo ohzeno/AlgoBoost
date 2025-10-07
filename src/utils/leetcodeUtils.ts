@@ -289,11 +289,34 @@ function parseExampleElements(
 
 function parseInput(inputText: string): any[] {
   const inputArray = [];
-  const paramRegex = /(\w+) = ("(?:[^"\\]|\\.)*"|\[.*?\]|[^,]+)/g;
-  let match;
-  while ((match = paramRegex.exec(inputText)) !== null) {
-    inputArray.push(match[2].trim());
+  let current = "";
+  let depth = 0;
+  let inQuote = false;
+  let afterEq = false;
+
+  for (const ch of inputText) {
+    if (ch === '"') inQuote = !inQuote;
+
+    if (!inQuote) {
+      if (ch === "=") {
+        afterEq = true;
+        current = "";
+        continue;
+      }
+      if (ch === "[") depth++;
+      if (ch === "]") depth--;
+      if (ch === "," && depth === 0 && afterEq) {
+        inputArray.push(current.trim());
+        current = "";
+        afterEq = false;
+        continue;
+      }
+    }
+
+    if (afterEq) current += ch;
   }
+
+  if (current) inputArray.push(current.trim());
   return inputArray;
 }
 
