@@ -242,8 +242,8 @@ function customUrlEncode(str: string): string {
   return str
     .split("")
     .map((char) => {
-      if (char.match(/[a-zA-Z0-9]/)) {
-        // 영문자와 숫자는 그대로 유지
+      if (char.match(/[a-zA-Z0-9\-_.~]/)) {
+        // URL-safe 문자는 그대로 유지
         return char;
       } else if (char === " ") {
         // 공백은 '+'로 변환
