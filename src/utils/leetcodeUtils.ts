@@ -247,6 +247,15 @@ function getExamples(
   return formatExampleData(targetLanguage, exampleData);
 }
 
+function decodeHTMLEntities(text: string): string {
+  return text
+    .replace(/\u00A0/g, " ") // non-breaking space로 이미 변환된 경우
+    .replace(/&nbsp;/g, " ")
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/&amp;/g, "&");
+}
+
 function parseExampleElements(
   exampleDivs: NodeListOf<Element>,
   exampleType: string,
@@ -274,6 +283,8 @@ function parseExampleElements(
       outputElemText =
         outputElement.nextElementSibling?.textContent?.trim() ?? "";
     }
+    inputElemText = decodeHTMLEntities(inputElemText);
+    outputElemText = decodeHTMLEntities(outputElemText);
     if (targetLanguage === "PYTHON") {
       outputElemText = outputElemText
         .replace(/\bfalse\b/g, "False")
