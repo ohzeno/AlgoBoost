@@ -6,6 +6,7 @@ import {
   copyTextToClipboard,
   copyTextToClipboardWithPort,
 } from "./clipboardUtils";
+import { sanitizeText } from "./textUtils";
 import { getStoredLanguage } from "./storageUtils";
 
 function getMatches(url: string): BaekjoonRegExpMatches {
@@ -66,7 +67,8 @@ export function getBaekjoonTitle(): string {
     // showNotification("Failed to get titleElement");
     return null;
   }
-  return titleElement.textContent.trim();
+  const title = titleElement.textContent.trim();
+  return sanitizeText(title);
 }
 
 function getPageInfo(url: string): {
