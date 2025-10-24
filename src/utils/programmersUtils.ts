@@ -220,7 +220,7 @@ function formatExampleData(targetLanguage, exampleData: any[]): string {
 
 function getExamples(targetLanguage: string): string {
   const examplesSection = Array.from(
-    document.querySelectorAll("h3, h4, h5 p")
+    document.querySelectorAll("h3, h4, h5, h5 p")
   ).find((el) => el.textContent?.includes("입출력 예"));
   if (!examplesSection) {
     // showNotification("Failed to get the examples");
