@@ -76,7 +76,7 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
               "$1^$2"
             );
             // HTML 엔티티를 적절한 기호로 변경
-            html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            html = decodeHTMLEntities(html);
             html = html.replace(/<\/?code>/g, ""); // code 태그 제거
             let result = html.replace(/<[^>]*>/g, ""); // 남은 HTML 태그 제거
             return `${bullet} ${result}`;
