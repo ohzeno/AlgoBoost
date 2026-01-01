@@ -76,7 +76,7 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
               "$1^$2"
             );
             // HTML 엔티티를 적절한 기호로 변경
-            html = html.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            html = decodeHTMLEntities(html);
             html = html.replace(/<\/?code>/g, ""); // code 태그 제거
             let result = html.replace(/<[^>]*>/g, ""); // 남은 HTML 태그 제거
             return `${bullet} ${result}`;
@@ -285,17 +285,38 @@ function parseExampleElements(
     }
     inputElemText = decodeHTMLEntities(inputElemText);
     outputElemText = decodeHTMLEntities(outputElemText);
+    let parsedInput = parseInput(inputElemText);
     if (targetLanguage === "PYTHON") {
-      outputElemText = outputElemText
-        .replace(/\bfalse\b/g, "False")
-        .replace(/\btrue\b/g, "True");
+      // Input 배열 내부의 각 문자열 변환
+      parsedInput = parsedInput.map((item) => formatPythonValue(item));
+
+      outputElemText = formatPythonValue(outputElemText);
     }
     exampleData.push({
-      data: parseInput(inputElemText),
+      data: parsedInput,
       answer: outputElemText,
     });
   }
   return exampleData;
+}
+
+function formatPythonValue(text: string): string {
+  // 1그룹: (" ... ") -> 쌍따옴표로 감싸진 문자열 (이스케이프 문자 처리 포함)
+  // 2그룹: \b(null|true|false)\b -> 단어 경계가 있는 키워드
+  return text.replace(
+    /("(?:[^"\\]|\\.)*")|\b(null|true|false)\b/g,
+    (match, quotedString, keyword) => {
+      // 따옴표로 감싸진 문자열이 매칭된 경우 -> 그대로 반환 (변경 X)
+      if (quotedString) return quotedString;
+
+      // 키워드가 매칭된 경우 -> 파이썬 스타일로 변경
+      if (keyword === "null") return "None";
+      if (keyword === "true") return "True";
+      if (keyword === "false") return "False";
+
+      return match;
+    }
+  );
 }
 
 function parseInput(inputText: string): any[] {
