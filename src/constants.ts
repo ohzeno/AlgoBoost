@@ -48,6 +48,7 @@ export const GLOBAL_CONSTANTS = {
     PYTHON: "Python",
     JAVA: "Java",
     JAVASCRIPT: "JavaScript",
+    RUST: "Rust",
     SQL: "SQL",
   },
 };
@@ -221,6 +222,54 @@ for (let i = 0; i < inputDatas.length; i++) {
     }
 }`,
     },
+    RUST: {
+      UPPER: `// ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
+struct Solution;
+
+/*
+constraints:
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
+*/
+
+
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
+
+
+#[macro_export]
+macro_rules! run_judge {
+    (
+        $func:path, 
+        [ $( { data: ( $($arg:expr),* ), answer: $ans:expr } ),* $(,)? ]
+    ) => {
+        $(
+            let result = $func($($arg),*);
+            let expected = $ans;            
+            if result == expected {
+                println!("pass");
+            } else {
+                let mut summary = String::from("fail");
+                for (label, content) in [("expected:", &expected), ("got:", &result)] {
+                    summary.push_str(&format!("\n  {}\n", label));
+                    summary.push_str(&format!("    {:?}", content));
+                }
+                summary = summary.trim_end().to_string();
+                println!("{}", summary);
+            }
+        )*
+    };
+}`,
+      LOWER: `fn main() {
+    run_judge!(
+        Solution::${GLOBAL_CONSTANTS.TEMPLATE_VAR.FUNCTION_NAME},
+        ${GLOBAL_CONSTANTS.TEMPLATE_VAR.INPUTDATAS}
+    );
+}
+
+/*
+LeetCode ${GLOBAL_CONSTANTS.TEMPLATE_VAR.DIFFICULTY}.
+제출 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.SUBMISSIONS}, 정답률 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ACCEPTANCE_RATE}
+*/`,
+    },
     EXAMPLES: {
       PYTHON: {
         start: "inputdatas = [",
@@ -231,6 +280,11 @@ for (let i = 0; i < inputDatas.length; i++) {
         start: "const inputDatas = [",
         item: `    {data: [${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}], answer: ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
         end: "];",
+      },
+      RUST: {
+        start: "[",
+        item: `            {data: (${GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA}), answer: ${GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER}}`,
+        end: "        ]",
       },
     },
   },
