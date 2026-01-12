@@ -352,18 +352,78 @@ function parseInput(inputText: string): any[] {
   return inputArray;
 }
 
-function formatExampleData(targetLanguage, exampleData: any[]): string {
+function formatExampleData(targetLanguage: string, exampleData: any[]): string {
   const template =
     LEETCODE.TEMPLATES.EXAMPLES[targetLanguage] ||
     LEETCODE.TEMPLATES.EXAMPLES.PYTHON;
 
-  const formattedData = exampleData
-    .map(
-      ({ data, answer }) =>
-        `    {"data": [${data.join(", ")}], "answer": ${answer}}`
-    )
+  const formattedItems = exampleData
+    .map(({ data, answer }) => {
+      let dataStr: string;
+      let answerStr: string;
+
+      if (targetLanguage === "RUST") {
+        dataStr = formatRustData(data);
+        answerStr = formatRustValue(answer);
+      } else {
+        dataStr = Array.isArray(data) ? data.join(", ") : data;
+        answerStr = answer;
+      }
+
+      return template.item
+        .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.DATA, dataStr)
+        .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.ANSWER, answerStr);
+    })
     .join(",\n");
-  return `${template.start}\n${formattedData}\n${template.end}`;
+
+  return `${template.start}\n${formattedItems}\n${template.end}`;
+}
+
+function formatRustData(data: any[]): string {
+  return data.map((item) => formatRustValue(item, true)).join(", ");
+}
+
+function formatRustValue(value: any, shouldParse: boolean = true): string {
+  const parsed = shouldParse ? parseRustItem(value) : value;
+
+  if (typeof parsed === "string") {
+    // 길이가 1이면 char로 처리 (작은따옴표)
+    if (parsed.length === 1) {
+      return `'${parsed}'`;
+    }
+    // 길이가 1보다 크면 &str로 처리 (큰따옴표)
+    return `"${parsed}"`;
+  }
+  if (typeof parsed === "boolean" || typeof parsed === "number") {
+    return String(parsed);
+  }
+  if (Array.isArray(parsed)) {
+    if (parsed.every(Array.isArray)) {
+      const nestedVecs = parsed
+        .map((subArray) => {
+          const elems = subArray
+            .map((el) => formatRustValue(el, false))
+            .join(", ");
+          return `vec![${elems}]`;
+        })
+        .join(", ");
+      return `vec![${nestedVecs}]`;
+    } else {
+      const elems = parsed.map((el) => formatRustValue(el, false)).join(", ");
+      return `vec![${elems}]`;
+    }
+  }
+  return JSON.stringify(parsed);
+}
+
+function parseRustItem(item: any): any {
+  if (typeof item !== "string") return item;
+  try {
+    const result = JSON.parse(item);
+    return result;
+  } catch (e) {
+    return item;
+  }
 }
 
 function getDifficultyStr(problemDescriptionDiv: HTMLDivElement): string {
@@ -404,8 +464,13 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
   return { submissions, acceptanceRate };
 }
 
-function getFirstFunctionName(code: string): string {
-  const match = code.match(/(?:function|var|const|let)\s+(\w+)\s*=/);
+function getFirstFunctionName(code: string, targetLanguage: string): string {
+  let match: string[];
+  if (targetLanguage === "RUST") {
+    match = code.match(/impl\s+Solution\s*\{[^}]*?pub\s+fn\s+(\w+)/s);
+  } else {
+    match = code.match(/(?:function|var|const|let)\s+(\w+)\s*=/);
+  }
   return match ? match[1] : "";
 }
 
@@ -417,7 +482,7 @@ function getLowerPart(
   const examples = getExamples(targetLanguage, problemDescriptionDiv);
   const difficulty = getDifficultyStr(problemDescriptionDiv);
   const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
-  const functionName = getFirstFunctionName(baseCode);
+  const functionName = getFirstFunctionName(baseCode, targetLanguage);
   const lowerTemplate =
     LEETCODE.TEMPLATES[targetLanguage]?.LOWER ||
     LEETCODE.TEMPLATES.PYTHON.LOWER;
