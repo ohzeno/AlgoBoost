@@ -441,26 +441,37 @@ function getStats(problemDescriptionDiv: HTMLDivElement): {
   submissions: string;
   acceptanceRate: string;
 } {
-  const statsDiv = Array.from(
-    problemDescriptionDiv.querySelectorAll("div")
-  ).find(
-    (div) =>
-      div.textContent.includes("Accepted") &&
-      div.textContent.includes("Acceptance Rate")
-  );
-  let submissions = "",
-    acceptanceRate = "";
-  if (statsDiv) {
-    const statElements = statsDiv.querySelectorAll("div");
-    statElements.forEach((el) => {
-      if (el.textContent?.includes("Accepted")) {
-        submissions =
-          el.nextElementSibling?.textContent?.split("/")[1]?.trim() ?? "";
-      } else if (el.textContent?.includes("Acceptance Rate")) {
-        acceptanceRate = el.nextElementSibling?.textContent?.trim() || "";
-      }
-    });
+  const allDivs = Array.from(problemDescriptionDiv.querySelectorAll("div"));
+
+  // "Accepted" 텍스트를 가진 div 중, nextElementSibling에 슬래시(/)가 있는 것 찾기. Submissions 페이지의 Accepted 엘리먼트가 매칭되는 것을 방지하기 위함
+  const acceptedDiv = allDivs.find((div) => {
+    const text = div.textContent || "";
+    const nextText = div.nextElementSibling?.textContent || "";
+    return (
+      text.trim() === "Accepted" &&
+      nextText.includes("/") &&
+      /\d/.test(nextText)
+    );
+  });
+
+  const rateDiv = allDivs.find((div) => {
+    const text = div.textContent || "";
+    const nextText = div.nextElementSibling?.textContent || "";
+    return text.trim() === "Acceptance Rate" && nextText.includes("%");
+  });
+
+  let submissions = "";
+  let acceptanceRate = "";
+
+  if (acceptedDiv) {
+    const nextText = acceptedDiv.nextElementSibling?.textContent || "";
+    submissions = nextText.split("/")[1]?.trim() ?? "";
   }
+
+  if (rateDiv) {
+    acceptanceRate = rateDiv.nextElementSibling?.textContent?.trim() || "";
+  }
+
   return { submissions, acceptanceRate };
 }
 
