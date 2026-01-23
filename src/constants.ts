@@ -231,9 +231,7 @@ constraints:
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 */
 
-
 ${GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE}
-
 
 #[macro_export]
 macro_rules! run_judge {
@@ -256,6 +254,12 @@ macro_rules! run_judge {
                 println!("{}", summary);
             }
         )*
+    };
+}
+
+macro_rules! svec {
+    ($($x:expr),* $(,)?) => {
+        vec![$($x.to_string()),*]
     };
 }`,
       LOWER: `fn main() {
