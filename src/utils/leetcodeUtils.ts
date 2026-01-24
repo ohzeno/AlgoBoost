@@ -25,18 +25,18 @@ export async function createLeetcodeSection(): Promise<void> {
   createFeatureBtn(
     section,
     "Copy Format",
-    async () => await copyTextToClipboardWithPort(LEETCODE.COMMANDS.GET_FORMAT)
+    async () => await copyTextToClipboardWithPort(LEETCODE.COMMANDS.GET_FORMAT),
   );
   createFeatureBtn(
     section,
     "Copy Title",
-    async () => await copyTextToClipboard(LEETCODE.COMMANDS.GET_TITLE)
+    async () => await copyTextToClipboard(LEETCODE.COMMANDS.GET_TITLE),
   );
 }
 
 export function getLeetcodeTitle(): string {
   const titleElement = document.querySelector<HTMLAnchorElement>(
-    LEETCODE.SELECTORS.title
+    LEETCODE.SELECTORS.title,
   );
   if (!titleElement) {
     // showNotification("Failed to get the title");
@@ -57,7 +57,7 @@ function getBullet(li: Element, index: number): string {
 
 function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
   const constraintsHeader = Array.from(
-    problemDescriptionDiv.querySelectorAll("p strong")
+    problemDescriptionDiv.querySelectorAll("p strong"),
   ).find((el) => el.textContent && el.textContent.includes("Constraints"));
 
   let constraints: string[] = [];
@@ -73,7 +73,7 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
             // <sup> 태그로 표현된 지수를 ^ 기호로 변경
             html = html.replace(
               /([0-9a-zA-Z]+)<sup>([0-9a-zA-Z]+)<\/sup>/g,
-              "$1^$2"
+              "$1^$2",
             );
             // HTML 엔티티를 적절한 기호로 변경
             html = decodeHTMLEntities(html);
@@ -82,7 +82,7 @@ function getConstraints(problemDescriptionDiv: HTMLDivElement): string {
             return `${bullet} ${result}`;
           }
           return "";
-        }
+        },
       );
     }
   }
@@ -118,7 +118,7 @@ function createEditorCodeMap(): EditorCodeMap | null {
 
   lines.forEach((line) => {
     const top = parseInt(
-      line.getAttribute("style")?.match(/top:(\d+)px/)?.[1] || "0"
+      line.getAttribute("style")?.match(/top:(\d+)px/)?.[1] || "0",
     );
     if (isNaN(top)) return;
 
@@ -139,7 +139,7 @@ function createEditorCodeMap(): EditorCodeMap | null {
 
 function createSortedLinesAndProcessedTops(
   lineNumberMap: LineNumberMap,
-  codeMap: EditorCodeMap
+  codeMap: EditorCodeMap,
 ): [sortedLines, processedTops] {
   const sortedLines: sortedLines = [];
   const processedTops = new Set<number>();
@@ -161,12 +161,12 @@ function processSoftWrapLines(
   codeMap: EditorCodeMap,
   lineNumberMap: LineNumberMap,
   sortedLines: sortedLines,
-  processedTops: processedTops
+  processedTops: processedTops,
 ): string[] {
   codeMap.forEach((lines, top) => {
     if (!processedTops.has(top)) {
       const prevTop = Math.max(
-        ...Array.from(lineNumberMap.keys()).filter((t) => t < top)
+        ...Array.from(lineNumberMap.keys()).filter((t) => t < top),
       );
 
       if (lineNumberMap.has(prevTop)) {
@@ -198,7 +198,7 @@ function extractEditorCode() {
   // 3. 라인 번호 순서대로 코드 재구성
   const [sortedLines, processedTops] = createSortedLinesAndProcessedTops(
     lineNumberMap,
-    codeMap
+    codeMap,
   );
 
   // 4. 소프트랩 라인 처리
@@ -206,7 +206,7 @@ function extractEditorCode() {
     codeMap,
     lineNumberMap,
     sortedLines,
-    processedTops
+    processedTops,
   );
 
   return processedLines.filter(Boolean).join("\n");
@@ -215,7 +215,7 @@ function extractEditorCode() {
 function getUpperPart(
   targetLanguage: string,
   problemDescriptionDiv: HTMLDivElement,
-  baseCode: string
+  baseCode: string,
 ): string {
   const curUrl = window.location.href.replace(/\/description\/$/, "/");
   const constraints = getConstraints(problemDescriptionDiv);
@@ -230,7 +230,8 @@ function getUpperPart(
 
 function getExamples(
   targetLanguage: string,
-  problemDescriptionDiv: HTMLDivElement
+  problemDescriptionDiv: HTMLDivElement,
+  baseCode: string,
 ): string {
   let exampleDivs: HTMLElement[] | NodeListOf<Element> =
     problemDescriptionDiv.querySelectorAll("pre");
@@ -242,9 +243,9 @@ function getExamples(
   const exampleData = parseExampleElements(
     exampleDivs,
     exampleType,
-    targetLanguage
+    targetLanguage,
   );
-  return formatExampleData(targetLanguage, exampleData);
+  return formatExampleData(targetLanguage, exampleData, baseCode);
 }
 
 function decodeHTMLEntities(text: string): string {
@@ -259,7 +260,7 @@ function decodeHTMLEntities(text: string): string {
 function parseExampleElements(
   exampleDivs: NodeListOf<Element>,
   exampleType: string,
-  targetLanguage: string
+  targetLanguage: string,
 ): any[] {
   const exampleData: any[] = [];
   for (const exampleDiv of exampleDivs) {
@@ -315,7 +316,7 @@ function formatPythonValue(text: string): string {
       if (keyword === "false") return "False";
 
       return match;
-    }
+    },
   );
 }
 
@@ -352,10 +353,27 @@ function parseInput(inputText: string): any[] {
   return inputArray;
 }
 
-function formatExampleData(targetLanguage: string, exampleData: any[]): string {
+function extractRustReturnType(baseCode: string): string {
+  const match = baseCode.match(/pub\s+fn\s+\w+\s*\([^)]*\)\s*->\s*([^{]+)/s);
+  if (!match) return "";
+  return match[1].trim();
+}
+
+function formatExampleData(
+  targetLanguage: string,
+  exampleData: any[],
+  baseCode: string,
+): string {
   const template =
     LEETCODE.TEMPLATES.EXAMPLES[targetLanguage] ||
     LEETCODE.TEMPLATES.EXAMPLES.PYTHON;
+
+  let paramTypes: string[] = [];
+  let returnType: string = "";
+  if (targetLanguage === "RUST") {
+    paramTypes = extractRustParamTypes(baseCode);
+    returnType = extractRustReturnType(baseCode);
+  }
 
   const formattedItems = exampleData
     .map(({ data, answer }) => {
@@ -363,8 +381,8 @@ function formatExampleData(targetLanguage: string, exampleData: any[]): string {
       let answerStr: string;
 
       if (targetLanguage === "RUST") {
-        dataStr = formatRustData(data);
-        answerStr = formatRustValue(answer);
+        dataStr = formatRustData(data, paramTypes);
+        answerStr = formatRustValue(answer, true, returnType);
       } else {
         dataStr = Array.isArray(data) ? data.join(", ") : data;
         answerStr = answer;
@@ -379,11 +397,30 @@ function formatExampleData(targetLanguage: string, exampleData: any[]): string {
   return `${template.start}\n${formattedItems}\n${template.end}`;
 }
 
-function formatRustData(data: any[]): string {
-  return data.map((item) => formatRustValue(item, true)).join(", ");
+function extractRustParamTypes(baseCode: string): string[] {
+  const match = baseCode.match(/pub\s+fn\s+\w+\s*\((.*?)\)\s*->/s);
+  if (!match) return [];
+
+  return match[1].split(",").map((param) => {
+    const parts = param.trim().split(":");
+    return parts[1]?.trim() || "";
+  });
 }
 
-function formatRustValue(value: any, shouldParse: boolean = true): string {
+function formatRustData(data: any[], paramTypes: string[]): string {
+  return data
+    .map((item, index) => {
+      const paramType = paramTypes[index] || "";
+      return formatRustValue(item, true, paramType);
+    })
+    .join(", ");
+}
+
+function formatRustValue(
+  value: any,
+  shouldParse: boolean = true,
+  targetType: string = "",
+): string {
   const parsed = shouldParse ? parseRustItem(value) : value;
 
   if (typeof parsed === "string") {
@@ -392,25 +429,31 @@ function formatRustValue(value: any, shouldParse: boolean = true): string {
       return `'${parsed}'`;
     }
     // 길이가 1보다 크면 &str로 처리 (큰따옴표)
-    return `"${parsed}"`;
+    // String 타입이면 .to_string() 추가
+    const needsToString = targetType === "String";
+    return needsToString ? `"${parsed}".to_string()` : `"${parsed}"`;
   }
   if (typeof parsed === "boolean" || typeof parsed === "number") {
     return String(parsed);
   }
   if (Array.isArray(parsed)) {
+    // Vec<String> 타입이면 svec! 사용
+    const isStringVec = targetType.includes("Vec<String>");
     if (parsed.every(Array.isArray)) {
+      const prefix = isStringVec ? "svec!" : "vec!";
       const nestedVecs = parsed
         .map((subArray) => {
           const elems = subArray
             .map((el) => formatRustValue(el, false))
             .join(", ");
-          return `vec![${elems}]`;
+          return `${prefix}[${elems}]`;
         })
         .join(", ");
       return `vec![${nestedVecs}]`;
     } else {
+      const prefix = isStringVec ? "svec!" : "vec!";
       const elems = parsed.map((el) => formatRustValue(el, false)).join(", ");
-      return `vec![${elems}]`;
+      return `${prefix}[${elems}]`;
     }
   }
   return JSON.stringify(parsed);
@@ -428,7 +471,7 @@ function parseRustItem(item: any): any {
 
 function getDifficultyStr(problemDescriptionDiv: HTMLDivElement): string {
   const difficultyElement = problemDescriptionDiv.querySelector<HTMLDivElement>(
-    LEETCODE.SELECTORS.difficulty
+    LEETCODE.SELECTORS.difficulty,
   );
   if (!difficultyElement) {
     // showNotification("Failed to get the difficulty");
@@ -488,9 +531,9 @@ function getFirstFunctionName(code: string, targetLanguage: string): string {
 function getLowerPart(
   targetLanguage: string,
   problemDescriptionDiv: HTMLDivElement,
-  baseCode: string
+  baseCode: string,
 ): string {
-  const examples = getExamples(targetLanguage, problemDescriptionDiv);
+  const examples = getExamples(targetLanguage, problemDescriptionDiv, baseCode);
   const difficulty = getDifficultyStr(problemDescriptionDiv);
   const { submissions, acceptanceRate } = getStats(problemDescriptionDiv);
   const functionName = getFirstFunctionName(baseCode, targetLanguage);
@@ -507,32 +550,33 @@ function getLowerPart(
 
 export async function getLeetcodeFormat(): Promise<string> {
   const problemDescriptionDiv = Array.from(
-    document.querySelectorAll("div")
+    document.querySelectorAll("div"),
   ).find(
     (div) =>
       div.textContent.includes("Example") &&
       div.textContent.includes("Input") &&
       div.textContent.includes("Output") &&
-      div.textContent.includes("Constraints")
+      div.textContent.includes("Constraints"),
   );
   const targetLanguage = await getStoredLanguage();
   const baseCode = extractEditorCode();
   const upperPart = getUpperPart(
     targetLanguage,
     problemDescriptionDiv,
-    baseCode
+    baseCode,
   );
   const lowerPart = getLowerPart(
     targetLanguage,
     problemDescriptionDiv,
-    baseCode
+    baseCode,
   );
-  return `${upperPart}\n\n\n${lowerPart}\n`;
+  let gap = targetLanguage === "RUST" ? "\n\n" : "\n\n\n";
+  return `${upperPart}${gap}${lowerPart}\n`;
 }
 
 export function handleLeetcodeRequest(requestFunction) {
   const descriptionElement = document.querySelector<HTMLDivElement>(
-    LEETCODE.SELECTORS.description
+    LEETCODE.SELECTORS.description,
   );
   if (!descriptionElement) {
     // showNotification("Failed to get the description");
