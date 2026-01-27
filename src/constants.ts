@@ -257,6 +257,7 @@ macro_rules! run_judge {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! svec {
     ($($x:expr),* $(,)?) => {
         vec![$($x.to_string()),*]
