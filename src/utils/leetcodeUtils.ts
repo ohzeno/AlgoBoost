@@ -228,6 +228,18 @@ function getUpperPart(
     .replace(GLOBAL_CONSTANTS.TEMPLATE_VAR.BASE_CODE, baseCode);
 }
 
+function hasValidPreElements(exampleDivs: NodeListOf<Element>): boolean {
+  return Array.from(exampleDivs).some(function (div) {
+    const strongEls = div.querySelectorAll("strong");
+    return Array.from(strongEls).some(function (el) {
+      return (
+        el.textContent?.includes("Input:") ||
+        el.textContent?.includes("Output:")
+      );
+    });
+  });
+}
+
 function getExamples(
   targetLanguage: string,
   problemDescriptionDiv: HTMLDivElement,
@@ -236,7 +248,8 @@ function getExamples(
   let exampleDivs: HTMLElement[] | NodeListOf<Element> =
     problemDescriptionDiv.querySelectorAll("pre");
   let exampleType = "pre";
-  if (exampleDivs.length === 0) {
+
+  if (exampleDivs.length === 0 || !hasValidPreElements(exampleDivs)) {
     exampleDivs = problemDescriptionDiv.querySelectorAll(".example-block");
     exampleType = "example-block";
   }
