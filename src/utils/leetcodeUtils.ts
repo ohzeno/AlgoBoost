@@ -303,7 +303,6 @@ function parseExampleElements(
     if (targetLanguage === "PYTHON") {
       // Input 배열 내부의 각 문자열 변환
       parsedInput = parsedInput.map((item) => formatPythonValue(item));
-
       outputElemText = formatPythonValue(outputElemText);
     }
     exampleData.push({

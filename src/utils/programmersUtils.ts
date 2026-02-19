@@ -29,18 +29,18 @@ export async function createProgrammersSection(): Promise<void> {
     section,
     "양식 복사",
     async () =>
-      await copyTextToClipboardWithPort(PROGRAMMERS.COMMANDS.GET_FORMAT)
+      await copyTextToClipboardWithPort(PROGRAMMERS.COMMANDS.GET_FORMAT),
   );
   createFeatureBtn(
     section,
     "제목 복사",
-    async () => await copyTextToClipboard(PROGRAMMERS.COMMANDS.GET_TITLE)
+    async () => await copyTextToClipboard(PROGRAMMERS.COMMANDS.GET_TITLE),
   );
 }
 
 export function getProgrammersTitle(): string {
   const titleElement = document.querySelector<HTMLDivElement>(
-    PROGRAMMERS.SELECTORS.title
+    PROGRAMMERS.SELECTORS.title,
   );
   if (!titleElement) {
     // showNotification("Failed to get the title");
@@ -52,7 +52,7 @@ export function getProgrammersTitle(): string {
 
 function extractEditorCode(): string {
   const hiddenTextarea = document.querySelector(
-    PROGRAMMERS.SELECTORS.editor
+    PROGRAMMERS.SELECTORS.editor,
   ) as HTMLTextAreaElement;
   if (!hiddenTextarea) {
     console.error("Hidden textarea not found");
@@ -129,9 +129,12 @@ function processListItems(ul: Element, depth: number = 0): string[] {
   });
 }
 
-function getConstraints(): string {
+function getConstraints(targetLanguage: string): string {
+  if (targetLanguage === "SQL") {
+    return getTableSchema();
+  }
   const constraintsSection = Array.from(document.querySelectorAll("h5")).find(
-    (el) => el.textContent.includes("제한사항")
+    (el) => el.textContent.includes("제한사항"),
   );
   if (!constraintsSection) {
     // showNotification("Failed to get the constraints");
@@ -220,7 +223,7 @@ function formatExampleData(targetLanguage, exampleData: any[]): string {
 
 function getExamples(targetLanguage: string): string {
   const examplesSection = Array.from(
-    document.querySelectorAll("h3, h4, h5, h5 p")
+    document.querySelectorAll("h3, h4, h5, h5 p"),
   ).find((el) => el.textContent?.includes("입출력 예"));
   if (!examplesSection) {
     // showNotification("Failed to get the examples");
@@ -233,7 +236,7 @@ function getExamples(targetLanguage: string): string {
 
 function getTemplateData1(targetLanguage: string): ProgrammersTemplateData1 {
   const baseCode = extractEditorCode();
-  const constraints = getConstraints();
+  const constraints = getConstraints(targetLanguage);
   const examples = getExamples(targetLanguage);
   return { baseCode, constraints, examples };
 }
@@ -262,12 +265,12 @@ function customUrlEncode(str: string): string {
 
 async function getTemplateData2(): Promise<ProgrammersTemplateData2> {
   const problemTag = document.querySelector<HTMLDivElement>(
-    PROGRAMMERS.SELECTORS.problemTag
+    PROGRAMMERS.SELECTORS.problemTag,
   ).textContent;
   const title = getProgrammersTitle();
   const searchUrl = PROGRAMMERS.URLS.SEARCH.replace(
     GLOBAL_CONSTANTS.TEMPLATE_VAR.PARAMETER,
-    customUrlEncode(title)
+    customUrlEncode(title),
   );
   const { level, finCnt, accRate } = await sendMessageWithPort({
     action: PROGRAMMERS.COMMANDS.GET_PROBLEM_INFO_REQUEST,
@@ -276,6 +279,75 @@ async function getTemplateData2(): Promise<ProgrammersTemplateData2> {
   });
 
   return { problemTag, level, finCnt, accRate };
+}
+
+function getTableSchema() {
+  let container = document.querySelector(
+    ".guide-section-description .markdown",
+  );
+  if (!container)
+    container = document.querySelector(".markdown.solarized-dark");
+  if (!container) return "";
+
+  let html = container.innerHTML;
+  let tables = container.querySelectorAll("table");
+  let results = [];
+
+  for (let i = 0; i < tables.length; i++) {
+    let table = tables[i];
+    let headers = [];
+    let ths = table.querySelectorAll("thead th");
+    for (let j = 0; j < ths.length; j++) {
+      headers.push(ths[j].textContent.trim().toLowerCase());
+    }
+
+    // 스키마 테이블 판별: 헤더에 'type'이 포함
+    let isSchema = headers.some(function (h) {
+      return h === "type";
+    });
+    if (!isSchema) continue;
+
+    // 이 테이블의 outerHTML이 container innerHTML에서 처음 등장하는 위치
+    let tableIndex = html.indexOf(table.outerHTML);
+    if (tableIndex === -1) continue;
+
+    // 테이블 이전 HTML에서 '<code>XXX</code> 테이블' 패턴 중 마지막
+    let beforeHtml = html.substring(0, tableIndex);
+    let namePattern = /<code>([A-Z_][A-Z0-9_]*)<\/code>\s*테이블/g;
+    let match;
+    let tableName = null;
+    while ((match = namePattern.exec(beforeHtml)) !== null) {
+      tableName = match[1];
+    }
+    if (!tableName) tableName = "TABLE_" + (results.length + 1);
+
+    // 이미 추출된 테이블이 있으면 스킵
+    let duplicate = results.some(function (r) {
+      return r.name === tableName;
+    });
+    if (duplicate) continue;
+
+    let rows = table.querySelectorAll("tbody tr");
+    let columns = [];
+    for (let k = 0; k < rows.length; k++) {
+      let cells = rows[k].querySelectorAll("td");
+      let cellTexts = [];
+      for (let l = 0; l < cells.length; l++) {
+        cellTexts.push(cells[l].textContent.trim());
+      }
+      columns.push(cellTexts);
+    }
+    results.push({ name: tableName, columns: columns });
+  }
+  if (results.length === 0) return "";
+  let output = "";
+  for (let r = 0; r < results.length; r++) {
+    output += results[r].name + "\n";
+    for (let c = 0; c < results[r].columns.length; c++) {
+      output += "    " + results[r].columns[c].join("\t") + "\n";
+    }
+  }
+  return output.trimEnd();
 }
 
 export async function getProgrammersFormat(): Promise<string> {
@@ -303,7 +375,7 @@ export async function getProgrammersFormat(): Promise<string> {
 async function searchReset(): Promise<void> {
   const resetBtn = (await waitForElement(
     PROGRAMMERS.SELECTORS.resetBtn,
-    300
+    300,
   )) as HTMLButtonElement;
   if (resetBtn) {
     resetBtn.click();
@@ -327,7 +399,7 @@ export async function getProgrammersProblemInfo(problemUrl): Promise<{
   }
   const tableRow = Array.from(table.querySelectorAll("tr")).find((row) => {
     const titleA = row.querySelector(
-      PROGRAMMERS.SELECTORS.titleA
+      PROGRAMMERS.SELECTORS.titleA,
     ) as HTMLAnchorElement;
     return titleA.href === problemUrl;
   });
