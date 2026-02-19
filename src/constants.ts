@@ -424,7 +424,7 @@ for (let i = 0; i < inputDatas.length; i++) {
 `,
     SQL: `# ${GLOBAL_CONSTANTS.TEMPLATE_VAR.URL}
 /*
-
+${GLOBAL_CONSTANTS.TEMPLATE_VAR.CONSTRAINTS}
 */
 
 
