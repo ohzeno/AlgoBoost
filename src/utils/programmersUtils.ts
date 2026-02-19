@@ -129,9 +129,12 @@ function processListItems(ul: Element, depth: number = 0): string[] {
   });
 }
 
-function getConstraints(): string {
+function getConstraints(targetLanguage: string): string {
+  if (targetLanguage === "SQL") {
+    return getTableSchema();
+  }
   const constraintsSection = Array.from(document.querySelectorAll("h5")).find(
-    (el) => el.textContent.includes("제한사항")
+    (el) => el.textContent.includes("제한사항"),
   );
   if (!constraintsSection) {
     // showNotification("Failed to get the constraints");
@@ -233,7 +236,7 @@ function getExamples(targetLanguage: string): string {
 
 function getTemplateData1(targetLanguage: string): ProgrammersTemplateData1 {
   const baseCode = extractEditorCode();
-  const constraints = getConstraints();
+  const constraints = getConstraints(targetLanguage);
   const examples = getExamples(targetLanguage);
   return { baseCode, constraints, examples };
 }
